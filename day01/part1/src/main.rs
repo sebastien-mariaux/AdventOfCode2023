@@ -33,6 +33,6 @@ mod test {
 
     #[test]
     fn test_solution() {
-        assert_eq!(54940, solve_puzzle("input"));
+        assert_eq!(54940, solve_puzzle("../input"));
     }
 }
