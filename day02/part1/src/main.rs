@@ -32,39 +32,6 @@ fn read_data(file_name: &str) -> String {
     fs::read_to_string(file_name).expect("Error")
 }
 
-// subgame
-// .split(", ")
-// .map(|cube| {
-//     let mut test = cube.split(" ");
-//     let count = test.next().unwrap().parse::<u32>().unwrap();
-//     let color = test.next().unwrap();
-//     stuff.insert(color, count);
-// })
-
-// let formatted_data = data
-//         .lines()
-//         .map(|game| {
-//             let mut game_possible = true;
-//             game.split(": ")
-//                 .nth(1)
-//                 .unwrap()
-//                 .split("; ")
-//                 .map(|subgame| {
-//                     let mut stuff = HashMap::new();
-//                     for cube in subgame.split(", ") {
-//                         let mut test = cube.split(" ");
-//                         let count = test.next().unwrap().parse::<u32>().unwrap();
-//                         let color = test.next().unwrap();
-
-//                         stuff.insert(color, count);
-//                     }
-//                     stuff
-//                 })
-//                 .collect::<Vec<_>>()
-//         })
-//         .collect::<Vec<_>>();
-//     println!("{:?}", formatted_data);
-
 #[cfg(test)]
 mod test {
     use super::*;
@@ -79,6 +46,3 @@ mod test {
         assert_eq!(2685, solve_puzzle("../input"));
     }
 }
-
-// red, green, or blue
-// only 12 red cubes, 13 green cubes, and 14 blue cubes?
