@@ -7,7 +7,7 @@ fn main() {
 
 fn solve_puzzle(file_name: &str) -> u32 {
     let data = read_data(file_name);
-    data.lines().map(|game| get_the_powaa(game)).sum::<u32>()
+    data.lines().map(get_the_powaa).sum::<u32>()
 }
 
 fn get_the_powaa(game: &str) -> u32 {
@@ -22,7 +22,7 @@ fn get_the_powaa(game: &str) -> u32 {
             }
         }
     }
-    mins.values().fold(1, |acc, f| acc * f)
+    mins.values().product::<u32>()
 }
 
 fn read_data(file_name: &str) -> String {
