@@ -109,7 +109,6 @@ fn get_surrounding_full_cells(i: usize, j: usize, table: &Vec<Vec<char>>) -> Vec
 
     all_neigbors
         .into_iter()
-        .filter(|(i, j)| i >= &0 && j >= &0 && i < &table.len() && j < &table[0].len())
         .filter(|(i, j)| table[*i][*j] != '.')
         .collect::<Vec<(usize, usize)>>()
 }
@@ -124,7 +123,7 @@ mod test {
 
     #[test]
     fn test_example_data() {
-        assert_eq!(4361, solve_puzzle("test_data"));
+        assert_eq!(4361, solve_puzzle("../test_data"));
     }
 
     #[test]
