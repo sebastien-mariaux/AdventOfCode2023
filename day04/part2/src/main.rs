@@ -8,14 +8,17 @@ fn main() {
 fn solve_puzzle(file_name: &str) -> u32 {
     let data = read_data(file_name);
 
-    let mut cards = HashMap::new();
-    let mut my_numbers = HashMap::new();
+    let mut cards_count = HashMap::new();
 
     for (i, line) in data.lines().enumerate() {
         let card_number = (i + 1) as u32;
+
+        let current_value = cards_count.get(&card_number).cloned().unwrap_or(0_u32);
+        cards_count.insert(card_number, current_value + 1);
+
         let card_data = line.split(": ").nth(1).unwrap();
         let mut values = card_data.split(" | ");
-        let winnings = values
+        let wins = values
             .next()
             .unwrap()
             .split_whitespace()
@@ -27,34 +30,13 @@ fn solve_puzzle(file_name: &str) -> u32 {
             .split_whitespace()
             .map(|x| x.parse::<u32>().unwrap())
             .collect::<Vec<u32>>();
-        cards.insert(card_number, winnings);
-        my_numbers.insert(card_number, numbers);
-    }
-
-    let mut cards_count = cards
-        .keys()
-        .map(|x| (x.to_owned(), 1))
-        .collect::<HashMap<u32, u32>>();
-
-    for (i, line) in data.lines().enumerate() {
-        let card_number = (i + 1) as u32;
-        println!("Playing card {}", card_number);
-        let matching_count = my_numbers
-            .get(&(&card_number))
-            .unwrap()
-            .iter()
-            .filter(|x| cards.get(&(i as u32 + 1)).unwrap().contains(x))
-            .count();
-        println!("Matching count {}", matching_count);
+        let matching_count = numbers.iter().filter(|x| wins.contains(x)).count();
         for n in card_number + 1..card_number + matching_count as u32 + 1 {
-            println!("Incrementing card {}", n);
-            cards_count.insert(
-                n,
-                cards_count.get(&n).unwrap() + cards_count.get(&card_number).unwrap(),
-            );
+            let current_value = cards_count.get(&n).cloned().unwrap_or(0_u32);
+            let increment = cards_count.get(&card_number).unwrap();
+            cards_count.insert(n, current_value + increment);
         }
     }
-    println!("{:?}", cards_count);
 
     cards_count.values().sum()
 }

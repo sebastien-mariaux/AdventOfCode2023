@@ -8,12 +8,21 @@ fn main() {
 fn solve_puzzle(file_name: &str) -> u32 {
     let data = read_data(file_name);
     let mut score: u32 = 0;
-    for (i, line) in data.lines().enumerate(){
-        let card_number =( i + 1) as u32;
+    for line in data.lines() {
         let card_data = line.split(": ").nth(1).unwrap();
         let mut values = card_data.split(" | ");
-        let winnings = values.next().unwrap().split_whitespace().map(|x| x.parse::<u32>().unwrap()).collect::<Vec<u32>>();
-        let my_numbers = values.next().unwrap().split_whitespace().map(|x| x.parse::<u32>().unwrap()).collect::<Vec<u32>>();
+        let winnings = values
+            .next()
+            .unwrap()
+            .split_whitespace()
+            .map(|x| x.parse::<u32>().unwrap())
+            .collect::<Vec<u32>>();
+        let my_numbers = values
+            .next()
+            .unwrap()
+            .split_whitespace()
+            .map(|x| x.parse::<u32>().unwrap())
+            .collect::<Vec<u32>>();
 
         let mut card_score: u32 = 0;
         for my_number in my_numbers {
@@ -25,7 +34,6 @@ fn solve_puzzle(file_name: &str) -> u32 {
                 }
             }
         }
-        println!("Card {} has a score of {}", card_number, card_score);
         score += card_score;
     }
 
