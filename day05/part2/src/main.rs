@@ -1,5 +1,5 @@
 use std::{
-    collections::{btree_map::Range, HashMap},
+    collections::HashMap,
     fs,
 };
 
@@ -13,8 +13,6 @@ fn solve_puzzle(file_name: &str) -> u128 {
     let mut split_data = data.split("\n\n");
 
     let seeds = split_data.next().unwrap();
-    // let seeds = get_seeds(seed_line);
-    // println!("{:?}", seeds);
 
     let mut maps: Vec<HashMap<(u128, u128), i128>> = Vec::new();
 
@@ -37,7 +35,8 @@ fn solve_puzzle(file_name: &str) -> u128 {
         maps.push(map);
     });
 
-    let mut min: u128 = 2664010277;
+    // VERY NAIVE SOLUTION looping over aaaaaall millions of seeds
+    let mut min: u128 = 10000000000;
     seeds
         .split(": ")
         .nth(1)
@@ -50,25 +49,10 @@ fn solve_puzzle(file_name: &str) -> u128 {
             let start = range[0];
             let count = range[1];
             for i in start..start + count {
-                let location  =get_from_source_to_destination(
-                    &maps[6],
-                    get_from_source_to_destination(
-                        &maps[5],
-                        get_from_source_to_destination(
-                            &maps[4],
-                            get_from_source_to_destination(
-                                &maps[3],
-                                get_from_source_to_destination(
-                                    &maps[2],
-                                    get_from_source_to_destination(
-                                        &maps[1],
-                                        get_from_source_to_destination(&maps[0], i),
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                );
+                let mut location = i;
+                for map in &maps {
+                    location = get_from_source_to_destination(map, location);
+                }
                 if location < min {
                     println!("{}", location);
                     min = location;
@@ -77,7 +61,6 @@ fn solve_puzzle(file_name: &str) -> u128 {
         });
 
         min
-
 }
 
 fn get_from_source_to_destination(map: &HashMap<(u128, u128), i128>, source: u128) -> u128 {
@@ -111,14 +94,3 @@ mod test {
         assert_eq!(51399228, solve_puzzle("../input"));
     }
 }
-
-// seeds: 79 14 55 13
-
-// seed-to-soil map:
-// destination range start at 50 - Source range start at 98 - length 2
-// seed 98 -> soil 50
-// seed 99 -> soil 51
-// 50 98 2
-
-// seed number 53 correspond to soil number 55
-// 52 50 48
