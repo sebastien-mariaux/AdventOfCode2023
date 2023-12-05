@@ -1,5 +1,5 @@
 use std::{
-    collections::{btree_map::Range, HashMap},
+    collections::HashMap,
     fs,
 };
 
@@ -24,7 +24,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
     let mut seed_to_soil = HashMap::new();
     loop {
         let line = lines.next().unwrap();
-        if line == "" {
+        if line.is_empty() {
             break;
         }
         let numbers = line
@@ -37,7 +37,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
 
         seed_to_soil.insert(
             (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
+            destination_range_start as i128 - source_range_start as i128,
         );
     }
 
@@ -45,7 +45,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
     let mut soil_to_fertilizer = HashMap::new();
     loop {
         let line = lines.next().unwrap();
-        if line == "" {
+        if line.is_empty() {
             break;
         }
         let numbers: Vec<u128> = line
@@ -58,7 +58,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
 
         soil_to_fertilizer.insert(
             (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
+            destination_range_start as i128 - source_range_start as i128,
         );
     }
     println!("{:?}", soil_to_fertilizer);
@@ -67,7 +67,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
     let mut fertilizer_to_water = HashMap::new();
     loop {
         let line = lines.next().unwrap();
-        if line == "" {
+        if line.is_empty() {
             break;
         }
         let numbers: Vec<u128> = line
@@ -80,7 +80,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
 
         fertilizer_to_water.insert(
             (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
+            destination_range_start as i128 - source_range_start as i128,
         );
     }
 
@@ -88,7 +88,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
     let mut water_to_light = HashMap::new();
     loop {
         let line = lines.next().unwrap();
-        if line == "" {
+        if line.is_empty() {
             break;
         }
         let numbers: Vec<u128> = line
@@ -101,7 +101,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
 
         water_to_light.insert(
             (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
+            destination_range_start as i128 - source_range_start as i128,
         );
     }
 
@@ -109,7 +109,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
     let mut light_to_temperature = HashMap::new();
     loop {
         let line = lines.next().unwrap();
-        if line == "" {
+        if line.is_empty() {
             break;
         }
         let numbers: Vec<u128> = line
@@ -122,7 +122,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
 
         light_to_temperature.insert(
             (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
+            destination_range_start as i128 - source_range_start as i128,
         );
     }
 
@@ -130,7 +130,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
     let mut temperature_to_humidity = HashMap::new();
     loop {
         let line = lines.next().unwrap();
-        if line == "" {
+        if line.is_empty() {
             break;
         }
         let numbers: Vec<u128> = line
@@ -143,7 +143,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
 
         temperature_to_humidity.insert(
             (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
+            destination_range_start as i128 - source_range_start as i128,
         );
     }
 
@@ -154,7 +154,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
             None => break,
             Some(line) => line,
         };
-        if line == "" {
+        if line.is_empty() {
             break;
         }
         let numbers: Vec<u128> = line
@@ -167,7 +167,7 @@ fn solve_puzzle(file_name: &str) -> u128 {
 
         humidity_to_location.insert(
             (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
+            destination_range_start as i128 - source_range_start as i128,
         );
     }
 
