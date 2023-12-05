@@ -221,12 +221,12 @@ mod test {
 
     #[test]
     fn test_example_data() {
-        assert_eq!(35, solve_puzzle("test_data"));
+        assert_eq!(35, solve_puzzle("../test_data"));
     }
 
     #[test]
     fn test_solution() {
-        assert_eq!(0, solve_puzzle("../input"));
+        assert_eq!(535088217, solve_puzzle("../input"));
     }
 }
 
