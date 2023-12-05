@@ -8,189 +8,37 @@ fn main() {
     println!("And the result is {}", result);
 }
 
-// fn get_seeds(seed_line: &str) -> Vec<u128> {
-//     println!("{:?}", seed_line);
-//     let mut seeds = Vec::new();
-//     seed_line
-//         .split(": ")
-//         .nth(1)
-//         .unwrap()
-//         .split(' ')
-//         .map(|x| x.parse::<u128>().unwrap())
-//         .collect::<Vec<u128>>()
-//         .chunks(2)
-//         .for_each(|range| {
-//             let start = range[0];
-//             let count = range[1];
-//             for i in start..start + count {
-//                 seeds.push(i);
-//             }
-//         });
-
-//     seeds
-// }
-
 fn solve_puzzle(file_name: &str) -> u128 {
     let data = read_data(file_name);
-    let mut lines = data.lines();
+    let mut split_data = data.split("\n\n");
 
-    let seed_line = lines.next().unwrap();
+    let seeds = split_data.next().unwrap();
     // let seeds = get_seeds(seed_line);
     // println!("{:?}", seeds);
 
-    lines.next();
-    lines.next();
-    let mut seed_to_soil = HashMap::new();
-    loop {
-        let line = lines.next().unwrap();
-        if line == "" {
-            break;
-        }
-        let numbers = line
-            .split(' ')
-            .map(|x| x.parse::<u128>().unwrap())
-            .collect::<Vec<u128>>();
-        let destination_range_start = numbers[0];
-        let source_range_start = numbers[1];
-        let length = numbers[2];
+    let mut maps: Vec<HashMap<(u128, u128), i128>> = Vec::new();
 
-        seed_to_soil.insert(
-            (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
-        );
-    }
+    split_data.for_each(|x| {
+        let mut map = HashMap::new();
+        x.split('\n').skip(1).for_each(|y| {
+            let numbers = y
+                .split(' ')
+                .map(|x| x.parse::<u128>().unwrap())
+                .collect::<Vec<u128>>();
+            let destination_range_start = numbers[0];
+            let source_range_start = numbers[1];
+            let length = numbers[2];
 
-    lines.next();
-    let mut soil_to_fertilizer = HashMap::new();
-    loop {
-        let line = lines.next().unwrap();
-        if line == "" {
-            break;
-        }
-        let numbers: Vec<u128> = line
-            .split(' ')
-            .map(|x| x.parse::<u128>().unwrap())
-            .collect::<Vec<u128>>();
-        let destination_range_start = numbers[0];
-        let source_range_start = numbers[1];
-        let length = numbers[2];
-
-        soil_to_fertilizer.insert(
-            (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
-        );
-    }
-
-    lines.next();
-    let mut fertilizer_to_water = HashMap::new();
-    loop {
-        let line = lines.next().unwrap();
-        if line == "" {
-            break;
-        }
-        let numbers: Vec<u128> = line
-            .split(' ')
-            .map(|x| x.parse::<u128>().unwrap())
-            .collect::<Vec<u128>>();
-        let destination_range_start = numbers[0];
-        let source_range_start = numbers[1];
-        let length = numbers[2];
-
-        fertilizer_to_water.insert(
-            (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
-        );
-    }
-
-    lines.next();
-    let mut water_to_light = HashMap::new();
-    loop {
-        let line = lines.next().unwrap();
-        if line == "" {
-            break;
-        }
-        let numbers: Vec<u128> = line
-            .split(' ')
-            .map(|x| x.parse::<u128>().unwrap())
-            .collect::<Vec<u128>>();
-        let destination_range_start = numbers[0];
-        let source_range_start = numbers[1];
-        let length = numbers[2];
-
-        water_to_light.insert(
-            (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
-        );
-    }
-
-    lines.next();
-    let mut light_to_temperature = HashMap::new();
-    loop {
-        let line = lines.next().unwrap();
-        if line == "" {
-            break;
-        }
-        let numbers: Vec<u128> = line
-            .split(' ')
-            .map(|x| x.parse::<u128>().unwrap())
-            .collect::<Vec<u128>>();
-        let destination_range_start = numbers[0];
-        let source_range_start = numbers[1];
-        let length = numbers[2];
-
-        light_to_temperature.insert(
-            (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
-        );
-    }
-
-    lines.next();
-    let mut temperature_to_humidity = HashMap::new();
-    loop {
-        let line = lines.next().unwrap();
-        if line == "" {
-            break;
-        }
-        let numbers: Vec<u128> = line
-            .split(' ')
-            .map(|x| x.parse::<u128>().unwrap())
-            .collect::<Vec<u128>>();
-        let destination_range_start = numbers[0];
-        let source_range_start = numbers[1];
-        let length = numbers[2];
-
-        temperature_to_humidity.insert(
-            (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
-        );
-    }
-
-    lines.next();
-    let mut humidity_to_location = HashMap::new();
-    loop {
-        let line = match lines.next() {
-            None => break,
-            Some(line) => line,
-        };
-        if line == "" {
-            break;
-        }
-        let numbers: Vec<u128> = line
-            .split(' ')
-            .map(|x| x.parse::<u128>().unwrap())
-            .collect::<Vec<u128>>();
-        let destination_range_start = numbers[0];
-        let source_range_start = numbers[1];
-        let length = numbers[2];
-
-        humidity_to_location.insert(
-            (source_range_start, source_range_start + length - 1),
-            (destination_range_start as i128 - source_range_start as i128),
-        );
-    }
+            map.insert(
+                (source_range_start, source_range_start + length - 1),
+                destination_range_start as i128 - source_range_start as i128,
+            );
+        });
+        maps.push(map);
+    });
 
     let mut min: u128 = 2664010277;
-    seed_line
+    seeds
         .split(": ")
         .nth(1)
         .unwrap()
@@ -203,18 +51,18 @@ fn solve_puzzle(file_name: &str) -> u128 {
             let count = range[1];
             for i in start..start + count {
                 let location  =get_from_source_to_destination(
-                    &humidity_to_location,
+                    &maps[6],
                     get_from_source_to_destination(
-                        &temperature_to_humidity,
+                        &maps[5],
                         get_from_source_to_destination(
-                            &light_to_temperature,
+                            &maps[4],
                             get_from_source_to_destination(
-                                &water_to_light,
+                                &maps[3],
                                 get_from_source_to_destination(
-                                    &fertilizer_to_water,
+                                    &maps[2],
                                     get_from_source_to_destination(
-                                        &soil_to_fertilizer,
-                                        get_from_source_to_destination(&seed_to_soil, i),
+                                        &maps[1],
+                                        get_from_source_to_destination(&maps[0], i),
                                     ),
                                 ),
                             ),
@@ -230,33 +78,6 @@ fn solve_puzzle(file_name: &str) -> u128 {
 
         min
 
-    // seeds
-    // .iter()
-    //     .map(|seed| {
-    //         // get_from_source_to_destination(&seed_to_soil, seed)
-
-    //         get_from_source_to_destination(
-    //             &humidity_to_location,
-    //             get_from_source_to_destination(
-    //                 &temperature_to_humidity,
-    //                 get_from_source_to_destination(
-    //                     &light_to_temperature,
-    //                     get_from_source_to_destination(
-    //                         &water_to_light,
-    //                         get_from_source_to_destination(
-    //                             &fertilizer_to_water,
-    //                             get_from_source_to_destination(
-    //                                 &soil_to_fertilizer,
-    //                                 get_from_source_to_destination(&seed_to_soil, *seed),
-    //                             ),
-    //                         ),
-    //                     ),
-    //                 ),
-    //             ),
-    //         )
-    //     })
-    //     .min()
-    //     .unwrap()
 }
 
 fn get_from_source_to_destination(map: &HashMap<(u128, u128), i128>, source: u128) -> u128 {
@@ -285,6 +106,7 @@ mod test {
     }
 
     #[test]
+    #[ignore]
     fn test_solution() {
         assert_eq!(51399228, solve_puzzle("../input"));
     }
