@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs, os::unix::process};
+use std::{collections::HashMap, fs};
 
 fn main() {
     let result = solve_puzzle("../input");
@@ -42,16 +42,19 @@ fn solve_puzzle(file_name: &str) -> i128 {
 
             map.insert(
                 (source_range_start, source_range_start + length - 1),
-                destination_range_start as i128 - source_range_start as i128,
+                destination_range_start - source_range_start,
             );
         });
         maps.push(map);
     });
 
     let mut current_ranges = seed_ranges;
+    // println!("Original range: {:?}", current_ranges);
     for map in &maps {
-        current_ranges = process_ranges(&current_ranges, &map);
-        println!("Iter: {:?}", current_ranges);
+        // println!("Map: {:?}", map);
+        // println!("Map: {:?}", map);
+        current_ranges = process_ranges(&current_ranges, map);
+        // println!("Iter: {:?}", current_ranges);
     }
 
     *current_ranges.iter().map(|(min, _)| min).min().unwrap()
@@ -77,19 +80,21 @@ fn process_range(
     map: &HashMap<(i128, i128), i128>,
 ) -> Vec<(i128, i128)> {
     let new_ranges =  split_range(range, map);
-    transform_range(&new_ranges, &map)
+    let transformed = transform_ranges(&new_ranges, map);
+    // println!("transformed ranges: {:?}", transformed);
+    transformed
 }
 
 fn split_range(
     range: &(i128, i128),
     map: &HashMap<(i128, i128), i128>,
 ) -> Vec<(i128, i128)> {
+    // println!("Splitting range: {:?}", range);
     let start = range.0;
     let end = range.1;
-    let map = map;
     // println!("Seed range: {:?}", range);
     // println!("Map: {:?}", map);
-    let included_limits = map.keys().fold(Vec::new(), |mut acc, (min, max)| {
+    let mut included_limits = map.keys().fold(Vec::new(), |mut acc, (min, max)| {
         if min >= &start && min <= &end {
             acc.push(*min);
         };
@@ -99,6 +104,9 @@ fn split_range(
         acc
     });
 
+    included_limits.sort();
+    // println!("Included limits: {:?}", included_limits);
+
     let mut new_ranges: Vec<(i128, i128)> = Vec::new();
     let mut previous_limit = start;
     for limit in included_limits {
@@ -106,21 +114,21 @@ fn split_range(
         previous_limit = limit;
     }
     new_ranges.push((previous_limit, end));
-    new_ranges
+    // println!("Split ranges: {:?}", new_ranges);
+    new_ranges.iter().filter(|(min, max)| min != max).map(|(min, max)| (*min, *max)).collect()
 }
 
-fn transform_range(
+fn transform_ranges(
     ranges: &Vec<(i128, i128)>,
     map: &HashMap<(i128, i128), i128>,
 ) -> Vec<(i128, i128)> {
     let mut new_ranges: Vec<(i128, i128)> = Vec::new();
 
     for range in ranges {
-        let containing_range = map
-            .keys()
-            .find(|(min, max)| min <= &range.0 && max >= &range.1);
+        let containing_range = find_containing_range(range, map);
+        // println!("containing range: {:?}", containing_range);
         let value = match containing_range {
-            None => 0 as i128,
+            None => 0_i128,
             Some(range) => *map.get(range).unwrap(),
         };
 
@@ -131,16 +139,8 @@ fn transform_range(
     new_ranges
 }
 
-fn get_from_source_to_destination(map: &HashMap<(i128, i128), i128>, source: i128) -> i128 {
-    let range = map
-        .keys()
-        .find(|(min, max)| min <= &source && max >= &source);
-    let result = match range {
-        None => source,
-        Some(range) => (source as i128 + map.get(range).unwrap()) as i128,
-    };
-
-    result
+fn find_containing_range<'a>(range: &'a (i128, i128), map: &'a HashMap<(i128, i128), i128>) -> Option<&'a (i128, i128)> {
+    map.keys().find(|(min, max)| min <= &range.0 && max >= &range.1)
 }
 
 fn read_data(file_name: &str) -> String {
@@ -161,4 +161,229 @@ mod test {
     fn test_solution() {
         assert_eq!(51399228, solve_puzzle("../input"));
     }
+
+    #[test]
+    fn test_transform_ranges_included() {
+        let mut map = HashMap::new();
+        map.insert((10, 20), 5);
+        let ranges = vec![(15, 17), (18, 19)];
+        let result = transform_ranges(&ranges, &map);
+        assert_eq!(vec![(20, 22), (23, 24)], result);
+    }
+
+    #[test]
+    fn test_transform_ranges_excluded() {
+        let mut map = HashMap::new();
+        map.insert((10, 20), 5);
+        let ranges = vec![(2, 5), (25, 30)];
+        let result = transform_ranges(&ranges, &map);
+        assert_eq!(vec![(2, 5), (25, 30)], result);
+    }
+
+    #[test]
+    fn test_transform_ranges_overlapping() {
+        let mut map = HashMap::new();
+        map.insert((10, 20), 5);
+        let ranges = vec![(5, 15)];
+        let result = transform_ranges(&ranges, &map);
+        assert_eq!(vec![(5, 15)], result);
+    }
+
+    #[test]
+    fn test_transform_negative() {
+        let mut map = HashMap::new();
+        map.insert((10, 20), -5);
+        let ranges = vec![(12, 15)];
+        let result: Vec<(i128, i128)> = transform_ranges(&ranges, &map);
+        assert_eq!(vec![(7, 10)], result);
+    }
+
+    #[test]
+    fn test_find_containing_range_true() {
+        let mut map = HashMap::new();
+        map.insert((10, 20), 1);
+        let range = (15, 16);
+        let result = find_containing_range(&range, &map);
+        assert_eq!(Some(&(10, 20)), result);
+    }
+
+    #[test]
+    fn test_find_containing_range_true_long_map() {
+        let mut map = HashMap::new();
+        map.insert((30, 40), 1);
+        map.insert((2, 3), 1);
+        map.insert((10, 20), 1);
+
+        let range = (15, 16);
+        let result = find_containing_range(&range, &map);
+        assert_eq!(Some(&(10, 20)), result);
+    }
+
+    #[test]
+    fn test_find_containing_range_false_1() {
+        let mut map = HashMap::new();
+        map.insert((10, 14), 1);
+        let range = (15, 16);
+        let result = find_containing_range(&range, &map);
+        assert_eq!(None, result);
+    }
+
+    #[test]
+    fn test_find_containing_range_false_2() {
+        let mut map = HashMap::new();
+        map.insert((18, 25), 1);
+        let range = (15, 16);
+        let result = find_containing_range(&range, &map);
+        assert_eq!(None, result);
+    }
+
+    #[test]
+    fn test_find_containing_range_false_intersect_1() {
+        let mut map = HashMap::new();
+        map.insert((14, 17), 1);
+        let range = (15, 20);
+        let result = find_containing_range(&range, &map);
+        assert_eq!(None, result);
+    }
+
+    #[test]
+    fn test_find_containing_range_false_intersect_2() {
+        let mut map = HashMap::new();
+        map.insert((17, 25), 1);
+        let range = (15, 20);
+        let result = find_containing_range(&range, &map);
+        assert_eq!(None, result);
+    }
+
+    #[test]
+    fn test_find_containing_range_false_included() {
+        let mut map = HashMap::new();
+        map.insert((16, 17), 1);
+        let range = (15, 20);
+        let result = find_containing_range(&range, &map);
+        assert_eq!(None, result);
+    }
+
+    #[test]
+    fn test_find_containing_range_identical() {
+        let mut map = HashMap::new();
+        map.insert((15, 20), 1);
+        let range = (15, 20);
+        let result = find_containing_range(&range, &map);
+        assert_eq!(Some(&(15,20)), result);
+    }
+
+    #[test]
+    fn test_find_containing_range_identical_min() {
+        let mut map = HashMap::new();
+        map.insert((15, 25), 1);
+        let range = (15, 20);
+        let result = find_containing_range(&range, &map);
+        assert_eq!(Some(&(15,25)), result);
+    }
+
+    #[test]
+    fn test_find_containing_range_identical_max() {
+        let mut map = HashMap::new();
+        map.insert((12, 20), 1);
+        let range = (15, 20);
+        let result = find_containing_range(&range, &map);
+        assert_eq!(Some(&(12,20)), result);
+    }
+
+    #[test]
+    fn test_split_range_no_split() {
+        let mut map = HashMap::new();
+        map.insert((0, 200), 1);
+        let range = (10, 20);
+        let result = split_range(&range, &map);
+        assert_eq!(vec![(10, 20)], result);
+    }
+
+    #[test]
+    fn test_split_range_3_ranges() {
+        let mut map = HashMap::new();
+        map.insert((12, 15), 1);
+        let range = (10, 20);
+        let result = split_range(&range, &map);
+        assert_eq!(vec![(10, 12), (12, 15), (15, 20)], result);
+    }
+
+    #[test]
+    fn test_split_range_similar() {
+        let mut map = HashMap::new();
+        map.insert((10, 20), 1);
+        let range = (10, 20);
+        let result = split_range(&range, &map);
+        assert_eq!(vec![(10, 20)], result);
+    }
+
+    #[test]
+    fn test_split_range_excluded_1() {
+        let mut map = HashMap::new();
+        map.insert((1, 5), 1);
+        let range = (10, 20);
+        let result = split_range(&range, &map);
+        assert_eq!(vec![(10, 20)], result);
+    }
+
+    #[test]
+    fn test_split_range_excluded_2() {
+        let mut map = HashMap::new();
+        map.insert((25, 30), 1);
+        let range = (10, 20);
+        let result = split_range(&range, &map);
+        assert_eq!(vec![(10, 20)], result);
+    }
+
+    #[test]
+    fn test_split_range_overlap_right() {
+        let mut map: HashMap<(i128, i128), i128> = HashMap::new();
+        map.insert((5, 15), 1);
+        let range = (10, 20);
+        let result = split_range(&range, &map);
+        assert_eq!(vec![(10, 15), (15, 20)], result);
+    }
+
+    #[test]
+    fn test_split_range_touch_right() {
+        let mut map: HashMap<(i128, i128), i128> = HashMap::new();
+        map.insert((5, 10), 1);
+        let range = (10, 20);
+        let result = split_range(&range, &map);
+        assert_eq!(vec![(10, 20)], result);
+    }
+
+    #[test]
+    fn test_split_range_touch_left() {
+        let mut map: HashMap<(i128, i128), i128> = HashMap::new();
+        map.insert((20, 30), 1);
+        let range = (10, 20);
+        let result = split_range(&range, &map);
+        assert_eq!(vec![(10,20)], result);
+    }
+
+    #[test]
+    fn test_split_range_overlap_left() {
+        let mut map: HashMap<(i128, i128), i128> = HashMap::new();
+        map.insert((15, 25), 1);
+        let range = (10, 20);
+        let result = split_range(&range, &map);
+        assert_eq!(vec![(10, 15), (15, 20)], result);
+    }
+
+    #[test]
+    fn test_split_range_complex_case() {
+        let mut map: HashMap<(i128, i128), i128> = HashMap::new();
+        map.insert((5, 12), 1);
+        map.insert((13, 14), 1);
+        map.insert((16, 18), 1);
+        map.insert((18, 28), 1);
+        let range = (10, 20);
+        let result = split_range(&range, &map);
+        assert_eq!(vec![(10,12), (12, 13), (13,14), (14,16), (16,18), (18,20)], result);
+    }
 }
+
+
+// 13202542
