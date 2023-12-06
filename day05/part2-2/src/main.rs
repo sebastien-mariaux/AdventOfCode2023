@@ -49,16 +49,11 @@ fn solve_puzzle(file_name: &str) -> i128 {
     });
 
     let mut current_ranges = seed_ranges;
-    // println!("Original range: {:?}", current_ranges);
     for map in &maps {
-        // println!("Map: {:?}", map);
-        // println!("Map: {:?}", map);
         current_ranges = process_ranges(&current_ranges, map);
-        // println!("Iter: {:?}", current_ranges);
     }
 
     *current_ranges.iter().map(|(min, _)| min).min().unwrap()
-
 }
 
 fn process_ranges(
@@ -75,25 +70,15 @@ fn process_ranges(
     new_ranges
 }
 
-fn process_range(
-    range: &(i128, i128),
-    map: &HashMap<(i128, i128), i128>,
-) -> Vec<(i128, i128)> {
-    let new_ranges =  split_range(range, map);
-    let transformed = transform_ranges(&new_ranges, map);
-    // println!("transformed ranges: {:?}", transformed);
-    transformed
+fn process_range(range: &(i128, i128), map: &HashMap<(i128, i128), i128>) -> Vec<(i128, i128)> {
+    let new_ranges = split_range(range, map);
+
+    transform_ranges(&new_ranges, map)
 }
 
-fn split_range(
-    range: &(i128, i128),
-    map: &HashMap<(i128, i128), i128>,
-) -> Vec<(i128, i128)> {
-    // println!("Splitting range: {:?}", range);
+fn split_range(range: &(i128, i128), map: &HashMap<(i128, i128), i128>) -> Vec<(i128, i128)> {
     let start = range.0;
     let end = range.1;
-    // println!("Seed range: {:?}", range);
-    // println!("Map: {:?}", map);
     let mut included_limits = map.keys().fold(Vec::new(), |mut acc, (min, max)| {
         if min >= &start && min <= &end {
             acc.push(*min);
@@ -105,7 +90,6 @@ fn split_range(
     });
 
     included_limits.sort();
-    // println!("Included limits: {:?}", included_limits);
 
     let mut new_ranges: Vec<(i128, i128)> = Vec::new();
     let mut previous_limit = start;
@@ -114,8 +98,11 @@ fn split_range(
         previous_limit = limit;
     }
     new_ranges.push((previous_limit, end));
-    // println!("Split ranges: {:?}", new_ranges);
-    new_ranges.iter().filter(|(min, max)| min != max).map(|(min, max)| (*min, *max)).collect()
+    new_ranges
+        .iter()
+        .filter(|(min, max)| min != max)
+        .map(|(min, max)| (*min, *max))
+        .collect()
 }
 
 fn transform_ranges(
@@ -126,7 +113,6 @@ fn transform_ranges(
 
     for range in ranges {
         let containing_range = find_containing_range(range, map);
-        // println!("containing range: {:?}", containing_range);
         let value = match containing_range {
             None => 0_i128,
             Some(range) => *map.get(range).unwrap(),
@@ -139,8 +125,12 @@ fn transform_ranges(
     new_ranges
 }
 
-fn find_containing_range<'a>(range: &'a (i128, i128), map: &'a HashMap<(i128, i128), i128>) -> Option<&'a (i128, i128)> {
-    map.keys().find(|(min, max)| min <= &range.0 && max >= &range.1)
+fn find_containing_range<'a>(
+    range: &'a (i128, i128),
+    map: &'a HashMap<(i128, i128), i128>,
+) -> Option<&'a (i128, i128)> {
+    map.keys()
+        .find(|(min, max)| min <= &range.0 && max >= &range.1)
 }
 
 fn read_data(file_name: &str) -> String {
@@ -270,7 +260,7 @@ mod test {
         map.insert((15, 20), 1);
         let range = (15, 20);
         let result = find_containing_range(&range, &map);
-        assert_eq!(Some(&(15,20)), result);
+        assert_eq!(Some(&(15, 20)), result);
     }
 
     #[test]
@@ -279,7 +269,7 @@ mod test {
         map.insert((15, 25), 1);
         let range = (15, 20);
         let result = find_containing_range(&range, &map);
-        assert_eq!(Some(&(15,25)), result);
+        assert_eq!(Some(&(15, 25)), result);
     }
 
     #[test]
@@ -288,7 +278,7 @@ mod test {
         map.insert((12, 20), 1);
         let range = (15, 20);
         let result = find_containing_range(&range, &map);
-        assert_eq!(Some(&(12,20)), result);
+        assert_eq!(Some(&(12, 20)), result);
     }
 
     #[test]
@@ -360,7 +350,7 @@ mod test {
         map.insert((20, 30), 1);
         let range = (10, 20);
         let result = split_range(&range, &map);
-        assert_eq!(vec![(10,20)], result);
+        assert_eq!(vec![(10, 20)], result);
     }
 
     #[test]
@@ -381,9 +371,11 @@ mod test {
         map.insert((18, 28), 1);
         let range = (10, 20);
         let result = split_range(&range, &map);
-        assert_eq!(vec![(10,12), (12, 13), (13,14), (14,16), (16,18), (18,20)], result);
+        assert_eq!(
+            vec![(10, 12), (12, 13), (13, 14), (14, 16), (16, 18), (18, 20)],
+            result
+        );
     }
 }
-
 
 // 13202542
