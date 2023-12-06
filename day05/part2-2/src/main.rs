@@ -41,7 +41,7 @@ fn solve_puzzle(file_name: &str) -> i128 {
             let length = numbers[2];
 
             map.insert(
-                (source_range_start, source_range_start + length - 1),
+                (source_range_start, source_range_start + length),
                 destination_range_start - source_range_start,
             );
         });
