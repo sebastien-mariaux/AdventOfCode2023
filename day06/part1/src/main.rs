@@ -8,24 +8,8 @@ fn main() {
 fn solve_puzzle(file_name: &str) -> u32 {
     let data = read_data(file_name);
     let mut lines = data.lines();
-    let times = lines
-        .next()
-        .unwrap()
-        .split(':')
-        .nth(1)
-        .unwrap()
-        .split_whitespace()
-        .map(|x| x.parse::<u32>().unwrap())
-        .collect::<Vec<u32>>();
-    let distances = lines
-        .next()
-        .unwrap()
-        .split(':')
-        .nth(1)
-        .unwrap()
-        .split_whitespace()
-        .map(|x| x.parse::<u32>().unwrap())
-        .collect::<Vec<u32>>();
+    let times = read_next_line(&mut lines);
+    let distances = read_next_line(&mut lines);
 
     times
         .iter()
@@ -45,6 +29,18 @@ fn solve_puzzle(file_name: &str) -> u32 {
 
 fn read_data(file_name: &str) -> String {
     fs::read_to_string(file_name).expect("Error")
+}
+
+fn read_next_line(lines: &mut std::str::Lines) -> Vec<u32> {
+    lines
+        .next()
+        .unwrap()
+        .split(':')
+        .nth(1)
+        .unwrap()
+        .split_whitespace()
+        .map(|x| x.parse::<u32>().unwrap())
+        .collect::<Vec<u32>>()
 }
 
 #[cfg(test)]

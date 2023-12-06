@@ -8,29 +8,8 @@ fn main() {
 fn solve_puzzle(file_name: &str) -> usize {
     let data = read_data(file_name);
     let mut lines = data.lines();
-    let time = lines
-        .next()
-        .unwrap()
-        .split(':')
-        .nth(1)
-        .unwrap()
-        .split_whitespace()
-        .collect::<Vec<&str>>()
-        .join("")
-        .parse::<usize>()
-        .unwrap();
-
-    let distance = lines
-        .next()
-        .unwrap()
-        .split(':')
-        .nth(1)
-        .unwrap()
-        .split_whitespace()
-        .collect::<Vec<&str>>()
-        .join("")
-        .parse::<usize>()
-        .unwrap();
+    let time = read_next_line(&mut lines);
+    let distance = read_next_line(&mut lines);
 
     let first = (0..time + 1)
         .find(|push_time| {
@@ -44,6 +23,20 @@ fn solve_puzzle(file_name: &str) -> usize {
 
 fn read_data(file_name: &str) -> String {
     fs::read_to_string(file_name).expect("Error")
+}
+
+fn read_next_line(lines: &mut std::str::Lines) -> usize {
+    lines
+        .next()
+        .unwrap()
+        .split(':')
+        .nth(1)
+        .unwrap()
+        .split_whitespace()
+        .collect::<Vec<&str>>()
+        .join("")
+        .parse::<usize>()
+        .unwrap()
 }
 
 #[cfg(test)]
