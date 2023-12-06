@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs};
+use std::{collections::HashMap, fs, os::unix::process};
 
 fn main() {
     let result = solve_puzzle("../input");
@@ -48,55 +48,65 @@ fn solve_puzzle(file_name: &str) -> i128 {
         maps.push(map);
     });
 
-    // let mut new_ranges:Vec<(i128, i128)>= Vec::new();
-    // let map  = &maps[0];
-    // let muts limits = map.keys().fold(Vec::new(), |mut acc, (min, max)| {
-    //     acc.push(*min);
-    //     acc.push(*max);
-    //     acc
-    // });
-    // for range in seed_ranges {
-    //     let start = range.0;
-    //     let end = range.1;
-    //     let conflicting_ranges = map.keys().filter(|(min, max)| {
-    //         min >= &start && min <= &end  ||
-    //         max >= &start && max <= &end ||
-    //         min <= &start && max >= &end
-    //     });
+    let mut current_ranges = seed_ranges;
+    for map in &maps {
+        current_ranges = process_ranges(&current_ranges, &map);
+        println!("Iter: {:?}", current_ranges);
+    }
 
+    *current_ranges.iter().map(|(min, _)| min).min().unwrap()
 
+}
 
-    let toto = seed_ranges.iter().map(|seed_range| {
-        let start = seed_range.0;
-        let end = seed_range.1;
-        let map = &maps[0];
-        println!("Seed range: {:?}", seed_range);
-        println!("Map: {:?}", map);
-        let included_limits = map.keys().fold(Vec::new(), |mut acc, (min, max)| {
-            if min >= &start && min <= &end {
-                acc.push(*min);
-            };
-            if max >= &start && max <= &end {
-                acc.push(*max);
-            };
-            acc
-        });
+fn process_ranges(
+    ranges: &Vec<(i128, i128)>,
+    map: &HashMap<(i128, i128), i128>,
+) -> Vec<(i128, i128)> {
+    let mut new_ranges: Vec<(i128, i128)> = Vec::new();
 
-        let mut new_ranges: Vec<(i128, i128)> = Vec::new();
-        let mut previous_limit = start;
-        for limit in included_limits {
-            new_ranges.push((previous_limit, limit));
-            previous_limit = limit;
-        }
-        new_ranges.push((previous_limit, end));
-        new_ranges = transform_range(&new_ranges, &map);
-        println!("New ranges: {:?}", new_ranges);
-        0
-    }).collect::<Vec<i128>>();
+    for range in ranges {
+        let processed_ranges = process_range(range, map);
+        new_ranges.extend(processed_ranges);
+    }
 
-    // If the range is
+    new_ranges
+}
 
-    0
+fn process_range(
+    range: &(i128, i128),
+    map: &HashMap<(i128, i128), i128>,
+) -> Vec<(i128, i128)> {
+    let new_ranges =  split_range(range, map);
+    transform_range(&new_ranges, &map)
+}
+
+fn split_range(
+    range: &(i128, i128),
+    map: &HashMap<(i128, i128), i128>,
+) -> Vec<(i128, i128)> {
+    let start = range.0;
+    let end = range.1;
+    let map = map;
+    // println!("Seed range: {:?}", range);
+    // println!("Map: {:?}", map);
+    let included_limits = map.keys().fold(Vec::new(), |mut acc, (min, max)| {
+        if min >= &start && min <= &end {
+            acc.push(*min);
+        };
+        if max >= &start && max <= &end {
+            acc.push(*max);
+        };
+        acc
+    });
+
+    let mut new_ranges: Vec<(i128, i128)> = Vec::new();
+    let mut previous_limit = start;
+    for limit in included_limits {
+        new_ranges.push((previous_limit, limit));
+        previous_limit = limit;
+    }
+    new_ranges.push((previous_limit, end));
+    new_ranges
 }
 
 fn transform_range(
@@ -147,7 +157,7 @@ mod test {
     }
 
     #[test]
-    #[ignore]
+    // #[ignore]
     fn test_solution() {
         assert_eq!(51399228, solve_puzzle("../input"));
     }
