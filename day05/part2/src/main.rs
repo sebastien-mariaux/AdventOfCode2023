@@ -89,7 +89,7 @@ mod test {
     }
 
     #[test]
-    #[ignore]
+    // #[ignore]
     fn test_solution() {
         assert_eq!(51399228, solve_puzzle("../input"));
     }
