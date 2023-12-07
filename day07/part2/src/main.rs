@@ -83,10 +83,7 @@ fn solve_puzzle(file_name: &str) -> u32 {
     hands
         .iter()
         .enumerate()
-        .map(|(i, hand)| {
-            println!("{}: {:?}", i, hand);
-            hand.bid * (i as u32 + 1)
-        })
+        .map(|(i, hand)| hand.bid * (i as u32 + 1))
         .sum()
 }
 
@@ -107,15 +104,12 @@ fn get_hand_type(cards: &[char]) -> u32 {
         .iter()
         .any(|(c, &count)| c != &&'J' && count + card_count.get(&'J').unwrap_or(&0) == 4)
     {
-        // assert_eq!(4, get_hand_type(&['2', 'J', 'J', '1', 'A']));
         return 6;
     };
     // Full house, where three cards have the same label, and the remaining two cards share a different label: 23332
-    if is_full_house(&card_count, &cards) {
+    if is_full_house(&card_count, cards) {
         return 5;
     };
-    //||
-    // card_count.iter().any(|(card, &count)| card != &&'J' && count == 2 && card_count.get(&'J').unwrap_or(&0) == &2 )
 
     // Three of a kind, where three cards have the same label, and the remaining two cards are each different from any other card in the hand: TTT98
     if card_count
@@ -126,20 +120,19 @@ fn get_hand_type(cards: &[char]) -> u32 {
     };
     // Two pair, where two cards share one label, two other cards share a second label, and the remaining card has a third label: 23432
     if card_count.values().filter(|&&count| count == 2).count() == 2
-        || (card_count.values().filter(|&&count| count == 2).count() == 1 && cards.contains(&&'J'))
+        || (card_count.values().filter(|&&count| count == 2).count() == 1 && cards.contains(&'J'))
     {
         return 3;
     };
     // One pair, where two cards share one label, and the other three cards have a different label from the pair and each other: A23A4
-    if card_count.values().filter(|&&count| count == 2).count() == 1 || cards.contains(&&'J') {
+    if card_count.values().filter(|&&count| count == 2).count() == 1 || cards.contains(&'J') {
         return 2;
     };
     // High card, where all cards' labels are distinct: 23456
-
     1
 }
 
-fn is_full_house(card_count: &HashMap<&char, u32>, cards: &[char]) -> bool {
+fn is_full_house(card_count: &HashMap<&char, u32>, _cards: &[char]) -> bool {
     // assert_eq!(4, get_hand_type(&['2', '2', 'J', '1', 'A']));
     let card_3 = card_count.iter().find(|(_, &count)| count == 3);
     let card_2 = card_count.iter().find(|(_, &count)| count == 2);
@@ -150,7 +143,6 @@ fn is_full_house(card_count: &HashMap<&char, u32>, cards: &[char]) -> bool {
     if card_count.iter().filter(|(_, &count)| count == 2).count() == 2 && card_j.is_some() {
         return true;
     }
-
 
     false
 }
@@ -182,7 +174,7 @@ mod test {
     #[test]
     // #[ignore]
     fn test_solution() {
-        assert_eq!(0, solve_puzzle("../input"));
+        assert_eq!(252137472, solve_puzzle("../input"));
     }
 
     #[test]
@@ -216,15 +208,3 @@ mod test {
         assert_eq!(4, get_hand_type(&['2', 'J', 'J', '1', 'A']));
     }
 }
-
-// 5 cards A, K, Q, T, 9, 8, 7, 6, 5, 4, 3, 2, J.
-// strength: where A is the highest and 2 is the lowest.
-
-// types
-// Five of a kind, where all five cards have the same label: AAAAA
-// Four of a kind, where four cards have the same label and one card has a different label: AA8AA
-// Full house, where three cards have the same label, and the remaining two cards share a different label: 23332
-// Three of a kind, where three cards have the same label, and the remaining two cards are each different from any other card in the hand: TTT98
-// Two pair, where two cards share one label, two other cards share a second label, and the remaining card has a third label: 23432
-// One pair, where two cards share one label, and the other three cards have a different label from the pair and each other: A23A4
-// High card, where all cards' labels are distinct: 23456

@@ -1,8 +1,5 @@
 use std::cmp::Ordering;
-use std::{
-    collections::{HashMap},
-    fs,
-};
+use std::{collections::HashMap, fs};
 
 fn main() {
     let result = solve_puzzle("input");
@@ -34,21 +31,21 @@ impl Ord for Hand {
         if self.hand_type < other.hand_type {
             return Ordering::Less;
         }
-        let self_cards = self
+        let self_strength = self
             .cards
             .iter()
             .map(|&card| get_strength(card))
             .collect::<Vec<u32>>();
-        let other_cards = other
+        let other_strength = other
             .cards
             .iter()
             .map(|&card| get_strength(card))
             .collect::<Vec<u32>>();
         for i in 0..5 {
-            if self_cards[i] > other_cards[i] {
+            if self_strength[i] > other_strength[i] {
                 return Ordering::Greater;
             }
-            if self_cards[i] < other_cards[i] {
+            if self_strength[i] < other_strength[i] {
                 return Ordering::Less;
             }
         }
@@ -95,8 +92,7 @@ fn solve_puzzle(file_name: &str) -> u32 {
 
 fn get_hand_type(cards: &[char]) -> u32 {
     let card_count = cards.iter().fold(HashMap::new(), |mut acc, card| {
-        let count = acc.entry(card).or_insert(0);
-        *count += 1;
+        *acc.entry(card).or_insert(0) += 1;
         acc
     });
     // Five of a kind, where all five cards have the same label: AAAAA
@@ -161,15 +157,3 @@ mod test {
         assert_eq!(249483956, solve_puzzle("../input"));
     }
 }
-
-// 5 cards A, K, Q, J, T, 9, 8, 7, 6, 5, 4, 3, or 2.
-// strength: where A is the highest and 2 is the lowest.
-
-// types
-// Five of a kind, where all five cards have the same label: AAAAA
-// Four of a kind, where four cards have the same label and one card has a different label: AA8AA
-// Full house, where three cards have the same label, and the remaining two cards share a different label: 23332
-// Three of a kind, where three cards have the same label, and the remaining two cards are each different from any other card in the hand: TTT98
-// Two pair, where two cards share one label, two other cards share a second label, and the remaining card has a third label: 23432
-// One pair, where two cards share one label, and the other three cards have a different label from the pair and each other: A23A4
-// High card, where all cards' labels are distinct: 23456
