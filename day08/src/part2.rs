@@ -1,12 +1,7 @@
 use num::integer::lcm;
 use std::{collections::HashMap, fs};
 
-fn main() {
-    let result = solve_puzzle("../input");
-    println!("And the result is {}", result);
-}
-
-fn solve_puzzle(file_name: &str) -> usize {
+pub fn solve_puzzle(file_name: &str) -> usize {
     let data = read_data(file_name);
     let mut lines = data.lines();
     let directions = lines.next().unwrap();
@@ -67,11 +62,11 @@ mod test {
 
     #[test]
     fn test_example_data() {
-        assert_eq!(6, solve_puzzle("test_data"));
+        assert_eq!(6, solve_puzzle("test_data3"));
     }
 
     #[test]
     fn test_solution() {
-        assert_eq!(13385272668829, solve_puzzle("../input"));
+        assert_eq!(13385272668829, solve_puzzle("input"));
     }
 }

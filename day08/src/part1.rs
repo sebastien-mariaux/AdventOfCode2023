@@ -1,11 +1,6 @@
 use std::{collections::HashMap, fs};
 
-fn main() {
-    let result = solve_puzzle("../input");
-    println!("And the result is {}", result);
-}
-
-fn solve_puzzle(file_name: &str) -> u32 {
+pub fn solve_puzzle(file_name: &str) -> u32 {
     let data = read_data(file_name);
     let mut lines = data.lines();
     let directions = lines.next().unwrap();
@@ -62,6 +57,6 @@ mod test {
 
     #[test]
     fn test_solution() {
-        assert_eq!(12083, solve_puzzle("../input"));
+        assert_eq!(12083, solve_puzzle("input"));
     }
 }
