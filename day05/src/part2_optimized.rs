@@ -1,4 +1,5 @@
-use std::{collections::HashMap, fs};
+use crate::utils::read_data;
+use std::collections::HashMap;
 
 pub fn solve_puzzle(file_name: &str) -> i128 {
     let data = read_data(file_name);
@@ -126,10 +127,6 @@ fn find_containing_range<'a>(
 ) -> Option<&'a (i128, i128)> {
     map.keys()
         .find(|(min, max)| min <= &range.0 && max >= &range.1)
-}
-
-fn read_data(file_name: &str) -> String {
-    fs::read_to_string(file_name).expect("Error")
 }
 
 #[cfg(test)]

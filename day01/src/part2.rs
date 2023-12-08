@@ -1,5 +1,5 @@
+use crate::utils::read_data;
 use std::collections::HashMap;
-use std::fs;
 
 pub fn solve_puzzle(file_name: &str) -> u32 {
     let data = fix_data(read_data(file_name));
@@ -12,10 +12,6 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
                 .unwrap()
         })
         .sum()
-}
-
-fn read_data(file_name: &str) -> String {
-    fs::read_to_string(file_name).expect("Error")
 }
 
 fn fix_data(data: String) -> String {

@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
-use std::fs;
+
+use crate::utils::read_data;
 
 pub fn solve_puzzle(file_name: &str) -> u128 {
     let data = read_data(file_name);
@@ -159,10 +160,6 @@ fn get_surrounding_full_cells(i: usize, j: usize, table: &Vec<Vec<char>>) -> Vec
         .into_iter()
         .filter(|(i, j)| table[*i][*j] != '.')
         .collect::<Vec<(usize, usize)>>()
-}
-
-fn read_data(file_name: &str) -> String {
-    fs::read_to_string(file_name).expect("Error")
 }
 
 #[cfg(test)]

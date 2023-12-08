@@ -1,10 +1,6 @@
+use crate::utils::read_data;
 use std::cmp::Ordering;
-use std::{collections::HashMap, fs};
-
-fn main() {
-    let result = solve_puzzle("input");
-    println!("And the result is {}", result);
-}
+use std::collections::HashMap;
 
 #[derive(Debug)]
 struct Hand {
@@ -156,10 +152,6 @@ fn get_strength(card: char) -> u32 {
         'T' => 11,
         _ => card.to_digit(10).unwrap(),
     }
-}
-
-fn read_data(file_name: &str) -> String {
-    fs::read_to_string(file_name).expect("Error")
 }
 
 #[cfg(test)]

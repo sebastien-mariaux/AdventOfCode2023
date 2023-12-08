@@ -1,4 +1,5 @@
 use std::{collections::HashMap, fs};
+use crate::utils::read_data;
 
 pub fn solve_puzzle(file_name: &str) -> u32 {
     let data = read_data(file_name);
@@ -6,9 +7,6 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
     0
 }
 
-fn read_data(file_name: &str) -> String {
-    fs::read_to_string(file_name).expect("Error")
-}
 
 #[cfg(test)]
 mod test {

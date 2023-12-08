@@ -1,4 +1,4 @@
-use std::fs;
+use crate::utils::read_data;
 
 pub fn solve_puzzle(file_name: &str) -> usize {
     let data = read_data(file_name);
@@ -14,10 +14,6 @@ pub fn solve_puzzle(file_name: &str) -> usize {
         .unwrap();
     let last = time - first;
     last - first + 1
-}
-
-fn read_data(file_name: &str) -> String {
-    fs::read_to_string(file_name).expect("Error")
 }
 
 fn read_next_line(lines: &mut std::str::Lines) -> usize {

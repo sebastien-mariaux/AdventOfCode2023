@@ -1,5 +1,6 @@
 use num::integer::lcm;
 use std::{collections::HashMap, fs};
+use crate::utils::read_data;
 
 pub fn solve_puzzle(file_name: &str) -> usize {
     let data = read_data(file_name);
@@ -52,9 +53,6 @@ pub fn solve_puzzle(file_name: &str) -> usize {
         .fold(0, |acc, x| if acc == 0 { x } else { lcm(acc, x) })
 }
 
-fn read_data(file_name: &str) -> String {
-    fs::read_to_string(file_name).expect("Error")
-}
 
 #[cfg(test)]
 mod test {

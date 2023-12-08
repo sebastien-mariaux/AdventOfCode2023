@@ -1,4 +1,5 @@
-use std::{collections::HashMap, fs};
+use crate::utils::read_data;
+use std::collections::HashMap;
 
 pub fn solve_puzzle(file_name: &str) -> u128 {
     let data = read_data(file_name);
@@ -55,10 +56,6 @@ fn get_from_source_to_destination(map: &HashMap<(u128, u128), i128>, source: u12
     };
 
     result
-}
-
-fn read_data(file_name: &str) -> String {
-    fs::read_to_string(file_name).expect("Error")
 }
 
 #[cfg(test)]

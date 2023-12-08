@@ -1,5 +1,6 @@
+use crate::utils::read_data;
 use std::cmp::Ordering;
-use std::{collections::HashMap, fs};
+use std::collections::HashMap;
 
 #[derive(Debug)]
 struct Hand {
@@ -131,10 +132,6 @@ fn get_strength(card: char) -> u32 {
         'T' => 10,
         _ => card.to_digit(10).unwrap(),
     }
-}
-
-fn read_data(file_name: &str) -> String {
-    fs::read_to_string(file_name).expect("Error")
 }
 
 #[cfg(test)]

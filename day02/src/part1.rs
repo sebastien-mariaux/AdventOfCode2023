@@ -1,4 +1,5 @@
-use std::{collections::HashMap, fs};
+use crate::utils::read_data;
+use std::collections::HashMap;
 
 pub fn solve_puzzle(file_name: &str) -> u32 {
     let data = read_data(file_name);
@@ -21,10 +22,6 @@ fn index_if_game_possible(i: usize, game: &str, totals: &HashMap<&str, u32>) -> 
         }
     }
     i as u32 + 1
-}
-
-fn read_data(file_name: &str) -> String {
-    fs::read_to_string(file_name).expect("Error")
 }
 
 #[cfg(test)]

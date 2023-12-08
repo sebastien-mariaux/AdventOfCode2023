@@ -1,4 +1,5 @@
-use std::{collections::HashMap, fs};
+use crate::utils::read_data;
+use std::collections::HashMap;
 
 pub fn solve_puzzle(file_name: &str) -> u32 {
     let data = read_data(file_name);
@@ -18,10 +19,6 @@ fn get_the_powaa(game: &str) -> u32 {
         }
     }
     mins.values().product::<u32>()
-}
-
-fn read_data(file_name: &str) -> String {
-    fs::read_to_string(file_name).expect("Error")
 }
 
 #[cfg(test)]
