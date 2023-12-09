@@ -1,10 +1,27 @@
 use crate::utils::read_data;
 use std::{collections::HashMap, fs};
+use itertools::Itertools;
 
-pub fn solve_puzzle(file_name: &str) -> u32 {
+
+pub fn solve_puzzle(file_name: &str) -> isize {
     let data = read_data(file_name);
 
-    1
+    data.lines().fold(0, |mut total, line| {
+        total += extra_value(line.split(" ").map(|x| x.parse::<isize>().unwrap()).collect());
+        total
+    })
+}
+
+fn extra_value(numbers: Vec<isize>) -> isize {
+    println!("{:?}", numbers);
+    if numbers.iter().all(|x| *x == 0) {
+        return 0;
+    }
+    let new_sequence = numbers.iter().tuple_windows().map(|(a, b)| b-a).collect::<Vec<isize>>();
+
+    let result = numbers.iter().last().unwrap() + extra_value(new_sequence);
+    println!("result: {}", result);
+    result
 }
 
 #[cfg(test)]
@@ -13,12 +30,11 @@ mod test {
 
     #[test]
     fn test_example_data() {
-        assert_eq!(0, solve_puzzle("test_data"));
+        assert_eq!(114, solve_puzzle("test_data"));
     }
 
     #[test]
-    #[ignore]
     fn test_solution() {
-        assert_eq!(0, solve_puzzle("input"));
+        assert_eq!(2008960228, solve_puzzle("input"));
     }
 }
