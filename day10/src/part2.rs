@@ -115,48 +115,49 @@ fn can_reach_border(new_map: &[String], i: usize, j: usize, outside_points: &mut
     let mut visited: HashSet<(usize, usize)> = HashSet::new();
     let mut stack: Vec<(usize, usize)> = Vec::new();
     stack.push((i, j));
-    println!("outside points length: {}", outside_points.len());
-    println!("inside points length: {}", inside_points.len());
 
-    while !stack.is_empty() {
+   loop  {
+        if stack.is_empty() {
+            inside_points.extend(visited);
+
+            return false;
+        }
+
         let current = stack.pop().unwrap();
         if visited.contains(&current) {
             continue;
         }
         visited.insert(current);
-        // println!("Visited lenght: {}", visited.len());
-        let neighbors = get_empty_neighbors(&new_map, current.0, current.1);
+        let neighbors = get_empty_neighbors(&new_map, current.0, current.1, &visited);
         for neighbor in neighbors {
             if inside_points.contains(&neighbor) {
                 return false;
             }
 
             if outside_points.contains(&neighbor) || neighbor.0 == 0 || neighbor.0 == new_map.len() - 1 || neighbor.1 == 0 || neighbor.1 == new_map[neighbor.0].len() - 1 {
+                outside_points.extend(visited);
                 outside_points.insert(neighbor);
                 return true;
             }
             if !visited.contains(&neighbor) {
                 stack.push(neighbor);
-                // println!("Stack lenght: {}", stack.len());
             }
         }
     }
-    inside_points.extend(visited);
-    false
 }
 
-fn get_empty_neighbors(new_map: &[String], i: usize, j: usize) -> Vec<(usize, usize)> {
+fn get_empty_neighbors(new_map: &[String], i: usize, j: usize, visited: &HashSet<(usize, usize)>) -> Vec<(usize, usize)> {
     let mut neighbors = Vec::new();
-    if i > 0 && ['.', ' '].contains(&new_map[i - 1].chars().nth(j).unwrap()) {
+    if i > 0 && ['.', ' '].contains(&new_map[i - 1].chars().nth(j).unwrap()) && !visited.contains(&(i - 1, j)){
         neighbors.push((i - 1, j));
     }
-    if j < new_map[i].len() - 1 && ['.', ' '].contains(&new_map[i].chars().nth(j + 1).unwrap()) {
+    if j < new_map[i].len() - 1 && ['.', ' '].contains(&new_map[i].chars().nth(j + 1).unwrap()) && !visited.contains(&(i, j + 1)) {
         neighbors.push((i, j + 1));
     }
-    if i < new_map.len() - 1 && ['.', ' '].contains(&new_map[i + 1].chars().nth(j).unwrap()) {
+    if i < new_map.len() - 1 && ['.', ' '].contains(&new_map[i + 1].chars().nth(j).unwrap()) && !visited.contains(&(i + 1, j)) {
         neighbors.push((i + 1, j));
     }
-    if j > 0 && ['.', ' '].contains(&new_map[i].chars().nth(j - 1).unwrap()) {
+    if j > 0 && ['.', ' '].contains(&new_map[i].chars().nth(j - 1).unwrap()) && !visited.contains(&(i, j - 1)) {
         neighbors.push((i, j - 1));
     }
     neighbors
@@ -228,8 +229,7 @@ mod test {
     }
 
     #[test]
-    #[ignore]
     fn test_solution() {
-        assert_eq!(0, solve_puzzle("input"));
+        assert_eq!(413, solve_puzzle("input"));
     }
 }
