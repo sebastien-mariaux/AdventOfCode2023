@@ -79,11 +79,12 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
 
     // For each ground point on the new map, check if it can reach the border of the map
     let mut count = 0;
-    // let mut visited_true: HashSet<(usize, usize)> = HashSet::new();
+    let mut outside_points: HashSet<(usize, usize)> = HashSet::new();
+    let mut inside_points: HashSet<(usize, usize)> = HashSet::new();
     // let mut visited_false: HashSet<(usize, usize)> = HashSet::new();
     for i in 0..new_map.len() {
         for j in 0..new_map[i].len() {
-            if is_inside_ground(&new_map, i, j) {
+            if is_inside_ground(&new_map, i, j, &mut outside_points, &mut inside_points) {
                 count += 1;
             }
         }
@@ -93,7 +94,7 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
     count
 }
 
-fn is_inside_ground(new_map: &[String], i: usize, j: usize) -> bool {
+fn is_inside_ground(new_map: &[String], i: usize, j: usize, outside_points: &mut HashSet<(usize, usize)>, inside_points:  &mut HashSet<(usize, usize)>   ) -> bool {
    let value = new_map[i].chars().nth(j).unwrap();
    if value != '.' {
        return false;
@@ -103,17 +104,19 @@ fn is_inside_ground(new_map: &[String], i: usize, j: usize) -> bool {
        return false;
    }
 
-   if can_reach_border(new_map, i, j) {
+   if can_reach_border(new_map, i, j, outside_points, inside_points) {
        return false;
    }
 
    true
 }
 
-fn can_reach_border(new_map: &[String], i: usize, j: usize) -> bool {
+fn can_reach_border(new_map: &[String], i: usize, j: usize, outside_points: &mut HashSet<(usize, usize)>, inside_points: &mut HashSet<(usize, usize)>) -> bool {
     let mut visited: HashSet<(usize, usize)> = HashSet::new();
     let mut stack: Vec<(usize, usize)> = Vec::new();
     stack.push((i, j));
+    println!("outside points length: {}", outside_points.len());
+    println!("inside points length: {}", inside_points.len());
 
     while !stack.is_empty() {
         let current = stack.pop().unwrap();
@@ -121,18 +124,24 @@ fn can_reach_border(new_map: &[String], i: usize, j: usize) -> bool {
             continue;
         }
         visited.insert(current);
-        println!("Visited lenght: {}", visited.len());
+        // println!("Visited lenght: {}", visited.len());
         let neighbors = get_empty_neighbors(&new_map, current.0, current.1);
         for neighbor in neighbors {
-            if neighbor.0 == 0 || neighbor.0 == new_map.len() - 1 || neighbor.1 == 0 || neighbor.1 == new_map[neighbor.0].len() - 1 {
+            if inside_points.contains(&neighbor) {
+                return false;
+            }
+
+            if outside_points.contains(&neighbor) || neighbor.0 == 0 || neighbor.0 == new_map.len() - 1 || neighbor.1 == 0 || neighbor.1 == new_map[neighbor.0].len() - 1 {
+                outside_points.insert(neighbor);
                 return true;
             }
             if !visited.contains(&neighbor) {
                 stack.push(neighbor);
-                println!("Stack lenght: {}", stack.len());
+                // println!("Stack lenght: {}", stack.len());
             }
         }
     }
+    inside_points.extend(visited);
     false
 }
 
@@ -219,7 +228,7 @@ mod test {
     }
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_solution() {
         assert_eq!(0, solve_puzzle("input"));
     }
