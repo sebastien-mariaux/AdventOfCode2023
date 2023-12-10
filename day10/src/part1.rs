@@ -70,9 +70,6 @@ fn get_neighbors(map: &[&str], i: usize, j: usize) -> Vec<(usize, usize)> {
             neighbors.push((i, j - 1));
         }
     }
-    println!("Current: ({}, {})", i, j);
-    println!("Neighbors: {:?}", neighbors.len());
-
     if  neighbors.len() !=2 {
         panic!("There is only two directions in a pipe!");
     }
@@ -84,14 +81,10 @@ fn get_neighbors(map: &[&str], i: usize, j: usize) -> Vec<(usize, usize)> {
 mod test {
     use super::*;
 
-    #[test]
-    fn test_example_data() {
-        assert_eq!(0, solve_puzzle("test_data"));
-    }
 
     #[test]
-    #[ignore]
+    // #[ignore]
     fn test_solution() {
-        assert_eq!(0, solve_puzzle("input"));
+        assert_eq!(6968, solve_puzzle("input"));
     }
 }
