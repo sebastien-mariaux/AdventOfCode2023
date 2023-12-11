@@ -1,6 +1,6 @@
 use crate::utils::read_data;
-use std::{collections::{HashMap, HashSet}, fs};
 use itertools::Itertools;
+use std::collections::HashSet;
 
 pub fn solve_puzzle(file_name: &str) -> u32 {
     let data = read_data(file_name);
@@ -25,14 +25,14 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
             row.insert(*j, '.');
         }
     }
-
+    // PRINT MAP
     // for row in universe.iter_mut() {
     //     println!("{}", row.iter().collect::<String>());
     // }
 
     // Get galaxies
     let mut galaxies = HashSet::new();
-    for (i,  row) in universe.iter().enumerate() {
+    for (i, row) in universe.iter().enumerate() {
         for (j, value) in row.iter().enumerate() {
             if value == &'#' {
                 galaxies.insert((i, j));
@@ -46,7 +46,6 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
         acc += distance(p[0], p[1]);
         acc
     })
-
 }
 
 fn distance(p1: &(usize, usize), p2: &(usize, usize)) -> u32 {

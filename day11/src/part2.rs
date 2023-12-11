@@ -1,6 +1,6 @@
 use crate::utils::read_data;
-use std::{collections::{HashMap, HashSet}, fs};
 use itertools::Itertools;
+use std::collections::HashSet;
 
 pub fn solve_puzzle(file_name: &str) -> usize {
     let data = read_data(file_name);
@@ -33,7 +33,7 @@ pub fn solve_puzzle(file_name: &str) -> usize {
 
     // Get galaxies
     let mut galaxies = HashSet::new();
-    for (i,  row) in universe.iter().enumerate() {
+    for (i, row) in universe.iter().enumerate() {
         for (j, value) in row.iter().enumerate() {
             if value == &'#' {
                 galaxies.insert((i, j));
@@ -41,6 +41,7 @@ pub fn solve_puzzle(file_name: &str) -> usize {
         }
     }
 
+    // PRINT MAP
     // for galaxy in galaxies.iter() {
     //     println!("{:?}", galaxy);
     // }
@@ -52,15 +53,14 @@ pub fn solve_puzzle(file_name: &str) -> usize {
         acc += distance(p[0], p[1], &universe);
         acc
     })
-
 }
 
-fn distance(p1: &(usize, usize), p2: &(usize, usize), universe: &Vec<Vec<char>>) -> usize {
+fn distance(p1: &(usize, usize), p2: &(usize, usize), universe: &[Vec<char>]) -> usize {
     let mut distance = 0;
     let start_v = p1.0.min(p2.0);
     let end_v = p1.0.max(p2.0);
-    for i in start_v..end_v {
-        if universe[i][p1.1] == '*' {
+    for row in universe.iter().take(end_v).skip(start_v) {
+        if row[p1.1] == '*' {
             distance += 1000000;
         } else {
             distance += 1;
@@ -76,7 +76,6 @@ fn distance(p1: &(usize, usize), p2: &(usize, usize), universe: &Vec<Vec<char>>)
             distance += 1;
         }
     }
-
 
     distance
 }
