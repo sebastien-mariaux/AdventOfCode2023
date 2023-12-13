@@ -23,7 +23,6 @@ fn check_pattern(pattern: &str, top_rows: &mut usize, left_columns: &mut usize) 
     let vertical_mirror = check_mirror(&map, true);
     if vertical_mirror.is_some() {
         *left_columns += vertical_mirror.unwrap() + 1;
-        return;
     }
 }
 
