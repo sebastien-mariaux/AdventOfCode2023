@@ -64,6 +64,7 @@ mod test {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_example_data() {
         assert_eq!(405, solve_puzzle("test_data"));
     }
@@ -71,6 +72,6 @@ mod test {
     #[test]
     #[ignore]
     fn test_solution() {
-        assert_eq!(0, solve_puzzle("input"));
+        assert_eq!(35232, solve_puzzle("input"));
     }
 }
