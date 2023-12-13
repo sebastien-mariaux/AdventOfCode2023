@@ -1,10 +1,62 @@
 use crate::utils::read_data;
-use std::{collections::HashMap, fs};
 
-pub fn solve_puzzle(file_name: &str) -> u32 {
+pub fn solve_puzzle(file_name: &str) -> usize {
     let data = read_data(file_name);
+    let mut left_columns = 0;
+    let mut top_rows = 0;
 
-    1
+    for (pattern_number, pattern) in data.split("\n\n").enumerate() {
+        println!("Pattern {}\n{}", pattern_number, pattern);
+        let mut reflection_found = false;
+        let map:Vec<Vec<char>> = pattern.lines().map(|line| line.chars().collect()).collect();
+        for i in 0..map.len() - 1 {
+
+            let mut counter = 0;
+            let mut is_reflection = true;
+            while i >= counter && i + counter < map.len() - 1 {
+                if map[i - counter] == map[i + 1 + counter] {
+                    counter += 1;
+                } else {
+                    is_reflection = false;
+                    break;
+                }
+            }
+            if is_reflection {
+                reflection_found = true;
+                println!("Found reflection at row {}", i);
+                println!("Top rows: {}", i + 1);
+                top_rows += i + 1;
+                break;
+            }
+        }
+
+        for j in 0..map[0].len() - 1 {
+
+            let mut counter = 0;
+            let mut is_reflection = true;
+            while j >= counter && j + counter < map[0].len() - 1 {
+                if map.iter().map(|row| row[j - counter]).collect::<Vec<char>>() == map.iter().map(|row| row[j + 1 + counter]).collect::<Vec<char>>() {
+                    counter += 1;
+                } else {
+                    is_reflection = false;
+                    break;
+                }
+            }
+            if is_reflection {
+                reflection_found = true;
+                println!("Found reflection at column {}", j);
+                println!("Left columns: {}", j + 1);
+                left_columns += j + 1;
+                break;
+            }
+        }
+        if !reflection_found {
+            panic!("No reflection found");
+        }
+    }
+    println!("Top rows: {}", top_rows);
+
+    top_rows * 100 + left_columns
 }
 
 #[cfg(test)]
@@ -13,7 +65,7 @@ mod test {
 
     #[test]
     fn test_example_data() {
-        assert_eq!(0, solve_puzzle("test_data"));
+        assert_eq!(405, solve_puzzle("test_data"));
     }
 
     #[test]
