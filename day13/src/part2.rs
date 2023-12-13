@@ -5,123 +5,89 @@ pub fn solve_puzzle(file_name: &str) -> usize {
     let mut left_columns = 0;
     let mut top_rows = 0;
 
-    for (pattern_number, pattern) in data.split("\n\n").enumerate() {
-        println!("Pattern {}\n{}", pattern_number, pattern);
-        let mut reflection_found = false;
-        let map:Vec<Vec<char>> = pattern.lines().map(|line| line.chars().collect()).collect();
-        // HORIZONTAL LINE
-        let mut horizontal_reflection: Option<usize> = None;
-        for i in 0..map.len() - 1 {
-            let mut counter = 0;
-            let mut is_reflection = true;
-            while i >= counter && i + counter < map.len() - 1 {
-                if map[i - counter] == map[i + 1 + counter] {
-                    counter += 1;
-                } else {
-                    is_reflection = false;
-                    break;
-                }
-            }
-            if is_reflection {
-                reflection_found = true;
-                horizontal_reflection = Some(i);
-                // println!("Found reflection at row {}", i);
-                // println!("Top rows: {}", i + 1);
-                // top_rows += i + 1;
-                // break;
-            }
-        }
-
-        // run again with one error possible
-        for i in 0..map.len() - 1 {
-            if horizontal_reflection.is_some() && horizontal_reflection.unwrap() == i {
-                continue;
-            }
-            let mut error_found = false;
-            let mut counter = 0;
-            let mut is_reflection = true;
-            while i >= counter && i + counter < map.len() - 1 {
-                let difference_count = map[i - counter].iter().zip(map[i + 1 + counter].iter()).filter(|(a, b)| a != b).count();
-                if map[i - counter] == map[i + 1 + counter]  {
-                    counter += 1;
-                } else if !error_found && difference_count == 1 {
-                    error_found = true;
-                    counter += 1;
-                }  else {
-                    is_reflection = false;
-                    break;
-                }
-            }
-            if is_reflection {
-                reflection_found = true;
-                println!("Found reflection at row {}", i);
-                println!("Top rows: {}", i + 1);
-                top_rows += i + 1;
-                break;
-            }
-        }
-
-        // VERITCAL LINE
-        let mut vertical_reflection: Option<usize> = None;
-        for j in 0..map[0].len() - 1 {
-
-            let mut counter = 0;
-            let mut is_reflection = true;
-            while j >= counter && j + counter < map[0].len() - 1 {
-                if map.iter().map(|row| row[j - counter]).collect::<Vec<char>>() == map.iter().map(|row| row[j + 1 + counter]).collect::<Vec<char>>() {
-                    counter += 1;
-                } else {
-                    is_reflection = false;
-                    break;
-                }
-            }
-            if is_reflection {
-                reflection_found = true;
-                vertical_reflection = Some(j);
-                // println!("Found reflection at column {}", j);
-                // println!("Left columns: {}", j + 1);
-                // left_columns += j + 1;
-                // break;
-            }
-        }
-
-        // run again with one error possible
-        for j in 0..map[0].len() - 1 {
-            if vertical_reflection.is_some() && vertical_reflection.unwrap() == j {
-                continue;
-            }
-            let mut error_found = false;
-            let mut counter = 0;
-            let mut is_reflection = true;
-            while j >= counter && j + counter < map[0].len() - 1 {
-                let difference_count = map.iter().map(|row| row[j - counter]).zip(map.iter().map(|row| row[j + 1 + counter])).filter(|(a, b)| a != b).count();
-                if map.iter().map(|row| row[j - counter]).collect::<Vec<char>>() == map.iter().map(|row| row[j + 1 + counter]).collect::<Vec<char>>() {
-                    counter += 1;
-                } else if !error_found && difference_count == 1 {
-                    error_found = true;
-                    counter += 1;
-                } else {
-                    is_reflection = false;
-                    break;
-                }
-            }
-            if is_reflection {
-                reflection_found = true;
-                println!("Found reflection at column {}", j);
-                println!("Left columns: {}", j + 1);
-                left_columns += j + 1;
-                break;
-            }
-        }
-
-
-        if !reflection_found {
-            panic!("No reflection found");
-        }
+    for pattern in data.split("\n\n") {
+        check_pattern(pattern, &mut top_rows, &mut left_columns);
     }
-    println!("Top rows: {}", top_rows);
 
     top_rows * 100 + left_columns
+}
+
+fn check_pattern(pattern: &str, top_rows: &mut usize, left_columns: &mut usize) {
+    let map: Vec<Vec<char>> = pattern.lines().map(|line| line.chars().collect()).collect();
+
+    let initial_horizontal_mirror = check_mirrors(&map, false, None, false);
+    let new_horizontal_mirror = check_mirrors(&map, true, initial_horizontal_mirror, false);
+    if new_horizontal_mirror.is_some() {
+        *top_rows += new_horizontal_mirror.unwrap() + 1;
+        return;
+    }
+
+    let initial_vertical_mirror = check_mirrors(&map, false, None, true);
+    let vertical_mirror = check_mirrors(&map, true, initial_vertical_mirror, true);
+    if vertical_mirror.is_some() {
+        *left_columns += vertical_mirror.unwrap() + 1;
+        return;
+    }
+}
+
+fn check_mirrors(
+    map: &Vec<Vec<char>>,
+    with_error: bool,
+    skip_row: Option<usize>,
+    transpose_map: bool,
+) -> Option<usize> {
+    if transpose_map {
+        return check_mirrors(&transpose(map.clone()), with_error, skip_row, false);
+    }
+    for i in 0..map.len() - 1 {
+        if with_error && skip_row.is_some() && skip_row.unwrap() == i {
+            continue;
+        }
+        let mut error_found = false;
+        let mut counter = 0;
+        let mut is_reflection = true;
+        while i >= counter && i + counter < map.len() - 1 {
+            let difference_count = if with_error {
+                map[i - counter]
+                    .iter()
+                    .zip(map[i + 1 + counter].iter())
+                    .filter(|(a, b)| a != b)
+                    .count()
+            } else {
+                0
+            };
+
+            if map[i - counter] == map[i + 1 + counter] {
+                counter += 1;
+            } else if with_error && !error_found && difference_count == 1 {
+                error_found = true;
+                counter += 1;
+            } else {
+                is_reflection = false;
+                break;
+            }
+        }
+        if is_reflection {
+            return Some(i);
+        }
+    }
+
+    None
+}
+
+// https://stackoverflow.com/questions/64498617/how-to-transpose-a-vector-of-vectors-in-rust
+fn transpose<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
+    assert!(!v.is_empty());
+    let len = v[0].len();
+    let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter()).collect();
+    (0..len)
+        .map(|_| {
+            iters
+                .iter_mut()
+                .map(|n| n.next().unwrap())
+                .collect::<Vec<T>>()
+        })
+        .collect()
 }
 
 #[cfg(test)]
@@ -134,8 +100,7 @@ mod test {
     }
 
     #[test]
-    #[ignore]
     fn test_solution() {
-        assert_eq!(0, solve_puzzle("input"));
+        assert_eq!(37982, solve_puzzle("input"));
     }
 }
