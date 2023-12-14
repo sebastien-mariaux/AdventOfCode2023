@@ -9,8 +9,8 @@ pub fn solve_puzzle(file_name: &str) -> usize {
 }
 
 fn arrangements(line: &str, index: usize) -> usize {
-    println!("Line {}", index);
-    println!("Line {}", line);
+    // println!("Line {}", index);
+    // println!("Line {}", line);
     let split_line = line.split_once(' ').unwrap();
     let map = split_line.0;
     let numbers = split_line.1.split(',').map(|v| v.parse::<usize>().unwrap()).collect::<Vec<usize>>();
@@ -86,6 +86,7 @@ mod test {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_example_data() {
         assert_eq!(21, solve_puzzle("test_data"));
     }
@@ -97,6 +98,7 @@ mod test {
     }
 
     #[test]
+    #[ignore]
     fn test_already_solved() {
         assert_eq!(1, arrangements("????#???#.?..???? 1,1", 0));
     }

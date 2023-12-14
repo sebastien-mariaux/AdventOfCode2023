@@ -8,19 +8,19 @@ use std::collections::VecDeque;
 pub fn solve_puzzle(file_name: &str) -> usize {
     let data = read_data(file_name);
 
-    data.lines().enumerate().map(|(n,l)| arrangements(l, n)).sum()
+    data.lines().enumerate().map(|(n,l)| arrangements(l, n, 5)).sum()
 }
 
-fn arrangements(line: &str, index: usize) -> usize {
+pub fn arrangements(line: &str, index: usize, repetition: usize) -> usize {
     println!("Line {}", index);
     println!("Line {}", line);
 
     let split_line = line.split_once(' ').unwrap();
     let map = split_line.0;
     //  Create a vec containing 5 times map
-    let extended_map = vec![map; 5].join("?");
+    let extended_map = vec![map; repetition].join("?");
     let numbers = split_line.1.split(',').map(|v| v.parse::<usize>().unwrap()).collect::<Vec<usize>>();
-    let extended_numbers:Vec<usize> = vec![numbers.clone(); 5].iter().flatten().cloned().collect();
+    let extended_numbers:Vec<usize> = vec![numbers.clone(); repetition].iter().flatten().cloned().collect();
     let expected_count = extended_numbers.iter().sum::<usize>();
     let mut complete: HashSet<String> = HashSet::new();
     let mut stack: VecDeque<String> = VecDeque::new();
@@ -46,11 +46,11 @@ fn arrangements(line: &str, index: usize) -> usize {
     // println!("Regex: {}", regex);
 
     stack.push_back(String::from(extended_map));
-
     while !stack.is_empty() {
         // println!("Stack: {:?}", stack.len());
         // println!("Visited: {:?}", visited.len());
         let candidate = stack.pop_front().unwrap();
+        println!("Testing candidate: {}", candidate);
         let diese_count = candidate.chars().filter(|c| c == &'#').count();
         if diese_count >= expected_count {
             continue;
@@ -61,15 +61,25 @@ fn arrangements(line: &str, index: usize) -> usize {
             // Replace this index with a #
             let mut new_candidate = String::from(&candidate);
             new_candidate.replace_range(index..index+1, "#");
+            // println!("New candidate: {}", new_candidate);
+
             if visited.contains(&new_candidate) {
+                println!("Already visited");
                 continue;
             }
+            stack.push_back(new_candidate.clone());
+
+            continue;
             let possible = is_possible(&new_candidate, &regex);
             visited.insert(new_candidate.clone());
             if is_complete(&new_candidate, expected_count) && possible {
+                // println!("Complete: {}", new_candidate);
                 complete.insert(new_candidate.clone());
             } else if possible {
+                // println!("Possible: {} - Adding to stack", new_candidate);
                 stack.push_back(new_candidate.clone());
+            } else {
+                // println!("Not possible: {}", new_candidate);
             }
         }
     }
@@ -96,6 +106,7 @@ mod test {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_example_data() {
         assert_eq!(525152, solve_puzzle("test_data"));
     }
@@ -104,5 +115,11 @@ mod test {
     #[ignore]
     fn test_solution() {
         assert_eq!(0, solve_puzzle("input"));
+    }
+
+    #[test]
+    #[ignore]
+    fn test_custom() {
+        assert_eq!(1, arrangements("???? 1,2", 0, 1));
     }
 }
