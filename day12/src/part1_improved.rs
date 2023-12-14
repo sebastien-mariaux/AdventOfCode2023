@@ -4,10 +4,7 @@ use std::collections::HashSet;
 pub fn solve_puzzle(file_name: &str) -> usize {
     let data = read_data(file_name);
 
-    data.lines()
-        .enumerate()
-        .map(|(_, l)| arrangements(l))
-        .sum()
+    data.lines().enumerate().map(|(_, l)| arrangements(l)).sum()
 }
 
 fn arrangements(line: &str) -> usize {
@@ -19,8 +16,7 @@ fn arrangements(line: &str) -> usize {
         .map(|v| v.parse::<usize>().unwrap())
         .collect::<Vec<usize>>();
 
-    let result = get_count(map, numbers);
-    result
+    get_count(map, numbers)
 }
 
 fn get_count(map: &str, numbers: Vec<usize>) -> usize {
@@ -73,7 +69,7 @@ fn get_count(map: &str, numbers: Vec<usize>) -> usize {
 
     let unique_maps = next_maps.iter().collect::<HashSet<_>>();
     for next_map in unique_maps {
-        count += get_count(&next_map, numbers[1..].to_vec());
+        count += get_count(next_map, numbers[1..].to_vec());
     }
 
     count
@@ -84,19 +80,16 @@ mod test {
     use super::*;
 
     #[test]
-    // #[ignore]
     fn test_example_data() {
         assert_eq!(21, solve_puzzle("test_data"));
     }
 
     #[test]
-    // #[ignore]
     fn test_solution() {
         assert_eq!(7090, solve_puzzle("input"));
     }
 
     #[test]
-    // #[ignore]
     fn test_already_solved() {
         assert_eq!(1, arrangements("????#???#.?..???? 1,1"));
     }
@@ -170,9 +163,7 @@ mod test {
     fn test_long_arrangement() {
         assert_eq!(
             1,
-            arrangements(
-                "???.###????.###????.###????.###????.### 1,1,3,1,1,3,1,1,3,1,1,3,1,1,3"
-            )
+            arrangements("???.###????.###????.###????.###????.### 1,1,3,1,1,3,1,1,3,1,1,3,1,1,3")
         )
     }
 

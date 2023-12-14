@@ -5,15 +5,10 @@ use std::collections::HashSet;
 pub fn solve_puzzle(file_name: &str) -> usize {
     let data = read_data(file_name);
 
-    data.lines()
-        .enumerate()
-        .map(|(n, l)| arrangements(l, n))
-        .sum()
+    data.lines().enumerate().map(|(_, l)| arrangements(l)).sum()
 }
 
-fn arrangements(line: &str, index: usize) -> usize {
-    // println!("Line {}", index);
-    // println!("Line {}", line);
+fn arrangements(line: &str) -> usize {
     let split_line = line.split_once(' ').unwrap();
     let map = split_line.0;
     let numbers = split_line
@@ -26,7 +21,7 @@ fn arrangements(line: &str, index: usize) -> usize {
     let mut stack: Vec<String> = Vec::new();
     let mut visited: HashSet<String> = HashSet::new();
 
-    if is_complete(&map.to_string(), expected_count) {
+    if is_complete(map, expected_count) {
         return 1;
     }
 
@@ -45,7 +40,6 @@ fn arrangements(line: &str, index: usize) -> usize {
             regex.push_str(r"(\.|\?)+");
         }
     }
-    println!("Regex: {}", regex);
 
     stack.push(String::from(map));
 
@@ -78,20 +72,18 @@ fn arrangements(line: &str, index: usize) -> usize {
             }
         }
     }
-    println!("Complete: {:?}", complete);
-    println!("Complete count: {}", complete.len());
-    if complete.len() == 0 {
+    if complete.is_empty() {
         panic!("No complete arrangements found");
     }
     complete.len()
 }
 
-fn is_possible(candidate: &String, regex: &String) -> bool {
-    let re = Regex::new(&regex).unwrap();
-    re.is_match(&candidate)
+fn is_possible(candidate: &str, regex: &str) -> bool {
+    let re = Regex::new(regex).unwrap();
+    re.is_match(candidate)
 }
 
-fn is_complete(candidate: &String, expected_count: usize) -> bool {
+fn is_complete(candidate: &str, expected_count: usize) -> bool {
     candidate.chars().filter(|c| c == &'#').count() == expected_count
 }
 
@@ -114,6 +106,6 @@ mod test {
     #[test]
     #[ignore]
     fn test_already_solved() {
-        assert_eq!(1, arrangements("????#???#.?..???? 1,1", 0));
+        assert_eq!(1, arrangements("????#???#.?..???? 1,1"));
     }
 }

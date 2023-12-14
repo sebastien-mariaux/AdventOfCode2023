@@ -7,12 +7,11 @@ pub fn solve_puzzle(file_name: &str) -> usize {
 
     data.lines()
         .enumerate()
-        .map(|(n, l)| arrangements(l, n, 5))
+        .map(|(_, l)| arrangements(l, 5))
         .sum()
 }
 
-pub fn arrangements(line: &str, index: usize, repetition: usize) -> usize {
-    println!("Line {}", index + 1);
+pub fn arrangements(line: &str, repetition: usize) -> usize {
     let split_line = line.split_once(' ').unwrap();
     let map = split_line.0;
     //  Create a vec containing 5 times map
@@ -22,7 +21,7 @@ pub fn arrangements(line: &str, index: usize, repetition: usize) -> usize {
         .split(',')
         .map(|v| v.parse::<usize>().unwrap())
         .collect::<Vec<usize>>();
-    let extended_numbers: Vec<usize> = vec![numbers.clone(); repetition]
+    let extended_numbers: Vec<usize> = vec![numbers; repetition]
         .iter()
         .flatten()
         .cloned()
@@ -30,8 +29,7 @@ pub fn arrangements(line: &str, index: usize, repetition: usize) -> usize {
 
     let mut visited: HashMap<(String, Vec<usize>), usize> = HashMap::new();
 
-    let result = get_count(&extended_map, extended_numbers, &mut visited);
-    result
+    get_count(&extended_map, extended_numbers, &mut visited)
 }
 
 fn get_count(
@@ -94,7 +92,7 @@ fn get_count(
     }
     let unique_maps = next_maps.iter().collect::<HashSet<_>>();
     for next_map in unique_maps {
-        count += get_count(&next_map, numbers[1..].to_vec(), visited);
+        count += get_count(next_map, numbers[1..].to_vec(), visited);
     }
     visited.insert((map.to_string(), numbers), count);
     count
@@ -105,51 +103,48 @@ mod test {
     use super::*;
 
     #[test]
-    // #[ignore]
     fn test_example_data() {
         assert_eq!(525152, solve_puzzle("test_data"));
     }
 
     #[test]
-    // #[ignore]
     fn test_solution() {
         assert_eq!(6792010726878, solve_puzzle("input"));
     }
 
     #[test]
-    // #[ignore]
     fn test_already_solved() {
-        assert_eq!(1, arrangements("????#???#.?..???? 1,1", 0, 1));
+        assert_eq!(1, arrangements("????#???#.?..???? 1,1", 1));
     }
 
     #[test]
     fn test_example_1() {
-        assert_eq!(1, arrangements("???.### 1,1,3", 0, 1));
+        assert_eq!(1, arrangements("???.### 1,1,3", 1));
     }
 
     #[test]
     fn test_example_2() {
-        assert_eq!(4, arrangements(".??..??...?##. 1,1,3", 0, 1));
+        assert_eq!(4, arrangements(".??..??...?##. 1,1,3", 1));
     }
 
     #[test]
     fn test_example_3() {
-        assert_eq!(1, arrangements("?#?#?#?#?#?#?#? 1,3,1,6", 0, 1));
+        assert_eq!(1, arrangements("?#?#?#?#?#?#?#? 1,3,1,6", 1));
     }
 
     #[test]
     fn test_example_4() {
-        assert_eq!(1, arrangements("????.#...#... 4,1,1", 0, 1));
+        assert_eq!(1, arrangements("????.#...#... 4,1,1", 1));
     }
 
     #[test]
     fn test_example_5() {
-        assert_eq!(4, arrangements("????.######..#####. 1,6,5", 0, 1));
+        assert_eq!(4, arrangements("????.######..#####. 1,6,5", 1));
     }
 
     #[test]
     fn test_example_6() {
-        assert_eq!(10, arrangements("?###???????? 3,2,1", 0, 1));
+        assert_eq!(10, arrangements("?###???????? 3,2,1", 1));
     }
 
     #[test]
@@ -200,7 +195,6 @@ mod test {
             1,
             arrangements(
                 "???.###????.###????.###????.###????.### 1,1,3,1,1,3,1,1,3,1,1,3,1,1,3",
-                0,
                 1
             )
         )
@@ -208,22 +202,22 @@ mod test {
 
     #[test]
     fn test_long_arrangement_2() {
-        assert_eq!(506250, arrangements("?????????###??????????###??????????###??????????###???????? 2,1,3,2,1,3,2,1,3,2,1,3,2,1", 0, 1));
-        assert_eq!(506250, arrangements("?###??????????###??????????###??????????###??????????###???????? 3,2,1,3,2,1,3,2,1,3,2,1,3,2,1", 0, 1))
+        assert_eq!(506250, arrangements("?????????###??????????###??????????###??????????###???????? 2,1,3,2,1,3,2,1,3,2,1,3,2,1", 1));
+        assert_eq!(506250, arrangements("?###??????????###??????????###??????????###??????????###???????? 3,2,1,3,2,1,3,2,1,3,2,1,3,2,1",  1))
     }
 
     #[test]
     fn test_long_arrangement_3() {
-        assert_eq!(16, arrangements("????.#...#...?????.#...#...?????.#...#...?????.#...#...?????.#...#... 4,1,1,4,1,1,4,1,1,4,1,1,4,1,1", 0, 1))
+        assert_eq!(16, arrangements("????.#...#...?????.#...#...?????.#...#...?????.#...#...?????.#...#... 4,1,1,4,1,1,4,1,1,4,1,1,4,1,1",  1))
     }
 
     #[test]
     fn test_long_arrangement_4() {
-        assert_eq!(2500, arrangements("????.######..#####.?????.######..#####.?????.######..#####.?????.######..#####.?????.######..#####. 1,6,5,1,6,5,1,6,5,1,6,5,1,6,5", 0, 1))
+        assert_eq!(2500, arrangements("????.######..#####.?????.######..#####.?????.######..#####.?????.######..#####.?????.######..#####. 1,6,5,1,6,5,1,6,5,1,6,5,1,6,5",  1))
     }
 
     #[test]
     fn test_arrangement_line_2_with_repetition() {
-        assert_eq!(3268760, arrangements("?????????? 1,1,4", 0, 5))
+        assert_eq!(3268760, arrangements("?????????? 1,1,4", 5))
     }
 }
