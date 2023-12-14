@@ -38,10 +38,8 @@ pub fn solve_puzzle(file_name: &str) -> usize {
 
 fn run_cycle(plateform: Vec<Vec<char>>) -> Vec<Vec<char>> {
     let tilted_north = tilt_north(plateform);
-
     let tilted_west = titl_west(tilted_north);
     let tilted_south = tilt_south(tilted_west);
-
     tilt_east(tilted_south)
 }
 
@@ -51,8 +49,8 @@ fn tilt_north(plateform: Vec<Vec<char>>) -> Vec<Vec<char>> {
 
 fn tilt_south(plateform: Vec<Vec<char>>) -> Vec<Vec<char>> {
     let reversed: Vec<Vec<char>> = plateform.iter().rev().map(|row| row.to_vec()).collect();
-    let titlted = tilt(reversed);
-    let reversed_back: Vec<Vec<char>> = titlted.iter().rev().map(|row| row.to_vec()).collect();
+    let tilted = tilt(reversed);
+    let reversed_back: Vec<Vec<char>> = tilted.iter().rev().map(|row| row.to_vec()).collect();
     reversed_back
 }
 
