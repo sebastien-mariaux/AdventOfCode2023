@@ -5,7 +5,10 @@ use std::collections::HashSet;
 pub fn solve_puzzle(file_name: &str) -> usize {
     let data = read_data(file_name);
 
-    data.lines().enumerate().map(|(n,l)| arrangements(l, n)).sum()
+    data.lines()
+        .enumerate()
+        .map(|(n, l)| arrangements(l, n))
+        .sum()
 }
 
 fn arrangements(line: &str, index: usize) -> usize {
@@ -13,14 +16,17 @@ fn arrangements(line: &str, index: usize) -> usize {
     // println!("Line {}", line);
     let split_line = line.split_once(' ').unwrap();
     let map = split_line.0;
-    let numbers = split_line.1.split(',').map(|v| v.parse::<usize>().unwrap()).collect::<Vec<usize>>();
+    let numbers = split_line
+        .1
+        .split(',')
+        .map(|v| v.parse::<usize>().unwrap())
+        .collect::<Vec<usize>>();
     let expected_count = numbers.iter().sum::<usize>();
     let mut complete: HashSet<String> = HashSet::new();
     let mut stack: Vec<String> = Vec::new();
     let mut visited: HashSet<String> = HashSet::new();
 
-
-    if is_complete(&map.to_string(), expected_count)  {
+    if is_complete(&map.to_string(), expected_count) {
         return 1;
     }
 
@@ -28,7 +34,11 @@ fn arrangements(line: &str, index: usize) -> usize {
     // Start with
     let mut regex = String::from(r"^(\.|\?)*");
     for (i, number) in numbers.iter().enumerate() {
-        regex.push_str(&format!("{}{}", r"(#|\?)", String::from("{") +  &number.to_string() + "}"));
+        regex.push_str(&format!(
+            "{}{}",
+            r"(#|\?)",
+            String::from("{") + &number.to_string() + "}"
+        ));
         if i == numbers.len() - 1 {
             regex.push_str(r"(\.|\?)*$");
         } else {
@@ -46,11 +56,16 @@ fn arrangements(line: &str, index: usize) -> usize {
             continue;
         }
         // For each '?' create a new candidate with a # in that position
-        let indexes = candidate.chars().enumerate().filter(|(_, x)|  x == &'?').map(|(i, _)| i).collect::<Vec<usize>>();
+        let indexes = candidate
+            .chars()
+            .enumerate()
+            .filter(|(_, x)| x == &'?')
+            .map(|(i, _)| i)
+            .collect::<Vec<usize>>();
         for index in indexes {
             // Replace this index with a #
             let mut new_candidate = String::from(&candidate);
-            new_candidate.replace_range(index..index+1, "#");
+            new_candidate.replace_range(index..index + 1, "#");
             if visited.contains(&new_candidate) {
                 continue;
             }
@@ -65,11 +80,10 @@ fn arrangements(line: &str, index: usize) -> usize {
     }
     println!("Complete: {:?}", complete);
     println!("Complete count: {}", complete.len());
-    if  complete.len() == 0 {
+    if complete.len() == 0 {
         panic!("No complete arrangements found");
     }
     complete.len()
-
 }
 
 fn is_possible(candidate: &String, regex: &String) -> bool {
