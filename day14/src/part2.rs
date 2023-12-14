@@ -4,9 +4,12 @@ use crate::utils::read_data;
 
 pub fn solve_puzzle(file_name: &str) -> usize {
     let data = read_data(file_name);
-    let mut  visited = HashMap::new();
+    let mut visited = HashMap::new();
 
-    let mut plateform: Vec<Vec<char>> = data.lines().map(|l | l.chars().collect::<Vec<char>>()).collect::<Vec<Vec<char>>>();
+    let mut plateform: Vec<Vec<char>> = data
+        .lines()
+        .map(|l| l.chars().collect::<Vec<char>>())
+        .collect::<Vec<Vec<char>>>();
     let mut copy = plateform.clone();
     let mut cycle_length = 0;
     let mut cycle_start = 0;
@@ -20,15 +23,17 @@ pub fn solve_puzzle(file_name: &str) -> usize {
             break;
         }
         visited.insert(copy.clone(), i);
-    };
-    for _ in  0..1000000000%cycle_length + (cycle_start/cycle_length + 1) * cycle_length{
+    }
+    for _ in 0..1000000000 % cycle_length + (cycle_start / cycle_length + 1) * cycle_length {
         plateform = run_cycle(plateform.clone());
     }
 
-    plateform.iter().rev().enumerate().map(|(y, line)| {
-        line.iter().filter(|c| c == &&'O').count() * (y + 1)
-    }).sum()
-
+    plateform
+        .iter()
+        .rev()
+        .enumerate()
+        .map(|(y, line)| line.iter().filter(|c| c == &&'O').count() * (y + 1))
+        .sum()
 }
 
 fn run_cycle(plateform: Vec<Vec<char>>) -> Vec<Vec<char>> {
@@ -36,7 +41,6 @@ fn run_cycle(plateform: Vec<Vec<char>>) -> Vec<Vec<char>> {
 
     let tilted_west = titl_west(tilted_north);
     let tilted_south = tilt_south(tilted_west);
-
 
     tilt_east(tilted_south)
 }
@@ -95,7 +99,7 @@ fn tilt(plateform: Vec<Vec<char>>) -> Vec<Vec<char>> {
     let mut tilted_north = vec![vec!['.'; cols_count]; rows_count];
 
     for (i, row) in plateform.iter().enumerate() {
-        for (j,  char) in row.iter().enumerate() {
+        for (j, char) in row.iter().enumerate() {
             if char == &'O' {
                 let new_position = get_new_position(&plateform, i, j);
                 tilted_north[new_position.0][new_position.1] = 'O';
@@ -107,15 +111,19 @@ fn tilt(plateform: Vec<Vec<char>>) -> Vec<Vec<char>> {
     tilted_north
 }
 
-fn get_new_position(plateform: &[Vec<char>], i: usize, j:usize) -> (usize, usize) {
+fn get_new_position(plateform: &[Vec<char>], i: usize, j: usize) -> (usize, usize) {
     let current_col = plateform.iter().map(|row| row[j]).collect::<Vec<char>>();
-    let closest_cube = current_col[0..i].iter().enumerate().filter(|(_, c)| c == &&'#')
-    .map(|(ix, _)| ix).max();
+    let closest_cube = current_col[0..i]
+        .iter()
+        .enumerate()
+        .filter(|(_, c)| c == &&'#')
+        .map(|(ix, _)| ix)
+        .max();
     match closest_cube {
         Some(pos) => {
             let rounded_below = current_col[pos..i].iter().filter(|c| c == &&'O').count();
             (pos + rounded_below + 1, j)
-        },
+        }
         None => {
             let rounded_below = current_col[0..i].iter().filter(|c| c == &&'O').count();
             (rounded_below, j)
@@ -138,4 +146,3 @@ mod test {
         assert_eq!(105008, solve_puzzle("input"));
     }
 }
-
