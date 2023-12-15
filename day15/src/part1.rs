@@ -1,10 +1,18 @@
 use crate::utils::read_data;
-use std::{collections::HashMap, fs};
 
 pub fn solve_puzzle(file_name: &str) -> u32 {
     let data = read_data(file_name);
+    data.split(',').map(|x| hash(x)).sum()
+}
 
-    1
+fn hash(input: &str) -> u32 {
+    let mut result = 0;
+    for c in input.chars() {
+            result += c as u32;
+            result *= 17;
+            result = result % 256;
+    }
+    result
 }
 
 #[cfg(test)]
@@ -13,12 +21,12 @@ mod test {
 
     #[test]
     fn test_example_data() {
-        assert_eq!(0, solve_puzzle("test_data"));
+        assert_eq!(1320, solve_puzzle("test_data"));
     }
 
     #[test]
-    #[ignore]
+    // #[ignore]
     fn test_solution() {
-        assert_eq!(0, solve_puzzle("input"));
+        assert_eq!(506869, solve_puzzle("input"));
     }
 }
