@@ -8,27 +8,27 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
         .map(|line| line.chars().collect::<Vec<char>>())
         .collect::<Vec<Vec<char>>>();
 
-    let mut visited: HashMap<(usize, usize, char), HashSet<(usize, usize)>> = HashMap::new();
+    let mut visited: HashMap<(usize, usize, char), u32> = HashMap::new();
     let mut beams: Vec<(usize, usize, char)> = Vec::new(); // Next pos row,  next pos col, next pos direction
     beams.push((0, 0, '>'));
 
-    let result = get_energized(0, 0, '>', &contraption, &mut visited);
+    let result = get_count(0, 0, '>', &contraption, &mut visited);
 
-    result.len() as u32
+    result
 }
 
-fn get_energized(i: usize, j: usize, d: char, contraption: &Vec<Vec<char>>, mut visited: &mut HashMap<(usize, usize, char), HashSet<(usize, usize)>>) -> HashSet<(usize, usize)> {
+fn get_count(i: usize, j: usize, d: char, contraption: &Vec<Vec<char>>, mut visited: &mut HashMap<(usize, usize, char), u32>) -> u32 {
     if visited.contains_key(&(i, j, d)) {
         return visited.get(&(i, j, d)).unwrap().clone();
     }
-
-    let mut energized: HashSet<(usize, usize)> = HashSet::new();
+    let mut count = 1;
     let next_cells = get_next_cells(i, j, d, &contraption);
     for next_cell in next_cells {
-        energized.extend(get_energized(next_cell.0, next_cell.1, next_cell.2, &contraption, &mut visited));
+        count += get_count(next_cell.0, next_cell.1, next_cell.2, &contraption, &mut visited);
     }
-    visited.insert((i, j, d), energized.clone());
-    energized
+    visited.insert((i, j, d), count);
+
+    count
 
 }
 
