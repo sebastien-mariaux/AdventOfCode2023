@@ -17,14 +17,19 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
         entries.push((0, j, 'v'));
         entries.push((contraption.len() - 1, j, '^'));
     }
-    entries.push((0, 0, '>'));
-    entries.push((0, 0, 'v'));
-    entries.push((0, contraption[0].len() - 1, '<'));
-    entries.push((0, contraption[0].len() - 1, 'v'));
-    entries.push((contraption.len() - 1, 0, '>'));
-    entries.push((contraption.len() - 1, 0, '^'));
-    entries.push((contraption.len() - 1, contraption[0].len() - 1, '<'));
-    entries.push((contraption.len() - 1, contraption[0].len() - 1, '^'));
+    // Angles
+    ['>', 'v']
+        .iter()
+        .for_each(|entry| entries.push((0, 0, *entry)));
+    ['<', 'v']
+        .iter()
+        .for_each(|entry| entries.push((0, contraption[0].len() - 1, *entry)));
+    ['>', '^']
+        .iter()
+        .for_each(|entry| entries.push((contraption.len() - 1, 0, *entry)));
+    ['<', '^']
+        .iter()
+        .for_each(|entry| entries.push((contraption.len() - 1, contraption[0].len() - 1, *entry)));
 
     let mut result = 0;
     for entry in entries {
