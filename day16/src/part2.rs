@@ -1,5 +1,5 @@
 use crate::utils::read_data;
-use std::{collections::{HashSet, HashMap}, vec};
+use std::{collections::HashSet, vec};
 
 pub fn solve_puzzle(file_name: &str) -> u32 {
     let data = read_data(file_name);
@@ -8,28 +8,48 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
         .map(|line| line.chars().collect::<Vec<char>>())
         .collect::<Vec<Vec<char>>>();
 
-    let mut visited: HashMap<(usize, usize, char), u32> = HashMap::new();
-    let mut beams: Vec<(usize, usize, char)> = Vec::new(); // Next pos row,  next pos col, next pos direction
-    beams.push((0, 0, '>'));
+    let mut entries = Vec::new();
+    for i in 1..contraption.len() - 1 {
+        entries.push((i, 0, '>'));
+        entries.push((i, contraption[0].len() - 1, '<'));
+    }
+    for j in 1..contraption[0].len() - 1 {
+        entries.push((0, j, 'v'));
+        entries.push((contraption.len() - 1, j, '^'));
+    }
+    entries.push((0, 0, '>'));
+    entries.push((0, 0, 'v'));
+    entries.push((0, contraption[0].len() - 1, '<'));
+    entries.push((0, contraption[0].len() - 1, 'v'));
+    entries.push((contraption.len() - 1, 0, '>'));
+    entries.push((contraption.len() - 1, 0, '^'));
+    entries.push((contraption.len() - 1, contraption[0].len() - 1, '<'));
+    entries.push((contraption.len() - 1, contraption[0].len() - 1, '^'));
 
-    let result = get_count(0, 0, '>', &contraption, &mut visited);
+    let mut result = 0;
+    for entry in entries {
+        let mut energized: HashSet<(usize, usize)> = HashSet::new();
+        let mut visited = HashSet::new();
+        let mut beams: Vec<(usize, usize, char)> = Vec::new(); // Next pos row,  next pos col, next pos direction
+        beams.push(entry);
+        visited.insert(entry);
 
+        while let Some(beam) = beams.pop() {
+            energized.insert((beam.0, beam.1));
+            let next_cells = get_next_cells(beam.0, beam.1, beam.2, &contraption);
+            for next_cell in next_cells {
+                if visited.contains(&next_cell) {
+                    continue;
+                }
+
+                visited.insert(next_cell);
+                beams.push(next_cell);
+            }
+        }
+
+        result = result.max(energized.len() as u32);
+    }
     result
-}
-
-fn get_count(i: usize, j: usize, d: char, contraption: &Vec<Vec<char>>, mut visited: &mut HashMap<(usize, usize, char), u32>) -> u32 {
-    if visited.contains_key(&(i, j, d)) {
-        return visited.get(&(i, j, d)).unwrap().clone();
-    }
-    let mut count = 1;
-    let next_cells = get_next_cells(i, j, d, &contraption);
-    for next_cell in next_cells {
-        count += get_count(next_cell.0, next_cell.1, next_cell.2, &contraption, &mut visited);
-    }
-    visited.insert((i, j, d), count);
-
-    count
-
 }
 
 fn get_next_cells(
@@ -124,16 +144,12 @@ mod test {
 
     #[test]
     fn test_example_data() {
-        assert_eq!(46, solve_puzzle("test_data"));
+        assert_eq!(51, solve_puzzle("test_data"));
     }
 
     #[test]
     // #[ignore]
     fn test_solution() {
-        assert_eq!(7951, solve_puzzle("input"));
+        assert_eq!(8148, solve_puzzle("input"));
     }
 }
-
-// empty space .
-// mirrors / and \
-// splitters | and -
