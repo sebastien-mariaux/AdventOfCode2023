@@ -20,12 +20,12 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
     minblock.insert((0, 0), 0);
     // minblock.insert(exit_cell, 1248);
 
-    let mut visited_cells: HashMap<(usize, usize), u32> = HashMap::new();
+    // let mut visited_cells: HashMap<(usize, usize), u32> = HashMap::new();
 
     let mut visited: HashMap<Vec<(usize, usize, char)>, u32> = HashMap::new();
     // Paths to visit
     let mut paths: Vec<Vec<(usize, usize, char, u32)>> = Vec::new();
-    paths.push(vec![(0, 0, 'R', 0)]);
+    paths.push(vec![(0, 0, 'S', 0)]);
 
     while !paths.is_empty() {
         let current_path = paths.pop().unwrap();
@@ -58,12 +58,12 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
                         if new_heat >= min_heat {
                             continue;
                         }
-                        if dir != 'L' {
-                            if visited_cells.get(&(i, j - 1)).unwrap_or(&u32::MAX) < &new_heat {
-                                continue;
-                            }
-                            visited_cells.insert((i, j - 1), new_heat);
-                        }
+                        // if dir != 'L' {
+                        //     if visited_cells.get(&(i, j - 1)).unwrap_or(&u32::MAX) < &new_heat {
+                        //         continue;
+                        //     }
+                        //     visited_cells.insert((i, j - 1), new_heat);
+                        // }
                         minblock.insert((i, j - 1), new_heat);
 
                         let mut new_path = current_path.clone();
@@ -81,12 +81,12 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
                         if new_heat >= min_heat {
                             continue;
                         }
-                        if dir != 'U' {
-                            if visited_cells.get(&(i-1, j )).unwrap_or(&u32::MAX) < &new_heat {
-                                continue;
-                            }
-                            visited_cells.insert((i-1, j), new_heat);
-                        }
+                        // if dir != 'U' {
+                        //     if visited_cells.get(&(i-1, j )).unwrap_or(&u32::MAX) < &new_heat {
+                        //         continue;
+                        //     }
+                        //     visited_cells.insert((i-1, j), new_heat);
+                        // }
                         minblock.insert((i - 1, j), new_heat);
 
                         let mut new_path = current_path.clone();
@@ -104,12 +104,12 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
                         if new_heat >= min_heat {
                             continue;
                         }
-                        if dir != 'R' {
-                            if visited_cells.get(&(i, j+1)).unwrap_or(&u32::MAX) < &new_heat {
-                                continue;
-                            }
-                            visited_cells.insert((i, j+1), new_heat);
-                        }
+                        // if dir != 'R' {
+                        //     if visited_cells.get(&(i, j+1)).unwrap_or(&u32::MAX) < &new_heat {
+                        //         continue;
+                        //     }
+                        //     visited_cells.insert((i, j+1), new_heat);
+                        // }
                         minblock.insert((i, j + 1), new_heat);
                         if (i, j + 1) == exit_cell {
                             println!(
@@ -135,12 +135,12 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
                         if new_heat >= min_heat {
                             continue;
                         }
-                        if dir != 'D' {
-                            if visited_cells.get(&(i+1, j)).unwrap_or(&u32::MAX) < &new_heat {
-                                continue;
-                            }
-                            visited_cells.insert((i+1, j), new_heat);
-                        }
+                        // if dir != 'D' {
+                        //     if visited_cells.get(&(i+1, j)).unwrap_or(&u32::MAX) < &new_heat {
+                        //         continue;
+                        //     }
+                        //     visited_cells.insert((i+1, j), new_heat);
+                        // }
                         minblock.insert((i + 1, j), new_heat);
                         if (i + 1, j) == exit_cell {
                             println!(
@@ -209,6 +209,11 @@ fn get_next_directions(dir: char, can_continue_straight: bool) -> Vec<char> {
             if can_continue_straight {
                 next_directions.push('D');
             }
+        }
+        // Starting point
+        'S' => {
+            next_directions.push('R');
+            next_directions.push('D');
         }
         _ => panic!("Unknown direction"),
     }
@@ -288,3 +293,4 @@ mod test {
 // 870
 // 877
 // 864?
+// 867
