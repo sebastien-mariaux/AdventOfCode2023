@@ -48,8 +48,16 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
         }
         visited.insert(path_without_heat, heat);
 
+        let can_continue_straight = can_continue_straight(&current_path);
+        // check if cell already visited
+        // if can_continue_straight {
+        //     if visited_cells.get(&(i, j)).unwrap_or(&u32::MAX) < &heat {
+        //         continue;
+        //     }
+        //     visited_cells.insert((i, j), heat);
+        // }
         // Continuing path...
-        let next_directions = get_next_directions(dir, can_continue_straight(&current_path));
+        let next_directions = get_next_directions(dir, can_continue_straight);
         for next_direction in next_directions {
             match next_direction {
                 'L' => {
@@ -58,7 +66,7 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
                         if new_heat >= min_heat {
                             continue;
                         }
-                        // if dir != 'L' {
+                        // if can_continue_straight {
                         //     if visited_cells.get(&(i, j - 1)).unwrap_or(&u32::MAX) < &new_heat {
                         //         continue;
                         //     }
@@ -81,7 +89,7 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
                         if new_heat >= min_heat {
                             continue;
                         }
-                        // if dir != 'U' {
+                        // if can_continue_straight {
                         //     if visited_cells.get(&(i-1, j )).unwrap_or(&u32::MAX) < &new_heat {
                         //         continue;
                         //     }
@@ -104,7 +112,7 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
                         if new_heat >= min_heat {
                             continue;
                         }
-                        // if dir != 'R' {
+                        // if can_continue_straight {
                         //     if visited_cells.get(&(i, j+1)).unwrap_or(&u32::MAX) < &new_heat {
                         //         continue;
                         //     }
@@ -135,7 +143,7 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
                         if new_heat >= min_heat {
                             continue;
                         }
-                        // if dir != 'D' {
+                        // if can_continue_straight {
                         //     if visited_cells.get(&(i+1, j)).unwrap_or(&u32::MAX) < &new_heat {
                         //         continue;
                         //     }
@@ -225,7 +233,7 @@ mod test {
     use super::*;
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_example_data() {
         assert_eq!(102, solve_puzzle("test_data"));
     }
@@ -233,7 +241,7 @@ mod test {
     #[test]
     #[ignore]
     fn test_solution() {
-        assert_eq!(0, solve_puzzle("input"));
+        assert_eq!(861, solve_puzzle("input"));
     }
 
     #[test]
@@ -289,8 +297,10 @@ mod test {
     }
 }
 
-
 // 870
 // 877
-// 864?
+// 864
 // 867
+// 886
+// 874
+// 861 ? YES
