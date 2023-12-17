@@ -18,15 +18,23 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
     // min value ever seen to reach a particular block
     let mut minblock: HashMap<(usize, usize), u32> = HashMap::new();
     minblock.insert((0, 0), 0);
-    minblock.insert(exit_cell, u32::MAX);
+    // minblock.insert(exit_cell, 1248);
 
+    let mut visited: HashSet<Vec<(usize, usize, char, u32)>> = HashSet::new();
     // Paths to visit
     let mut paths: Vec<Vec<(usize, usize, char, u32)>> = Vec::new();
     paths.push(vec![(0, 0, 'R', 0)]);
 
     while !paths.is_empty() {
         let current_path = paths.pop().unwrap();
+        if visited.contains(&current_path) {
+            continue;
+        }
+        visited.insert(current_path.clone());
         let (i, j, dir, heat) = current_path.last().unwrap().clone();
+        if heat >= *minblock.get(&exit_cell).unwrap_or(&u32::MAX) {
+            continue;
+        }
         let next_directions = get_next_directions(dir, can_continue_straight(&current_path));
         for next_direction in next_directions {
             match next_direction {
