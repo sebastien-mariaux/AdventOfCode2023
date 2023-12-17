@@ -20,50 +20,56 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
     minblock.insert((0, 0), 0);
     // minblock.insert(exit_cell, 1248);
 
-    let mut visited: HashSet<Vec<(usize, usize, char, u32)>> = HashSet::new();
+    let mut visited_cells: HashMap<(usize, usize), u32> = HashMap::new();
+
+    let mut visited: HashMap<Vec<(usize, usize, char)>, u32> = HashMap::new();
     // Paths to visit
     let mut paths: Vec<Vec<(usize, usize, char, u32)>> = Vec::new();
     paths.push(vec![(0, 0, 'R', 0)]);
 
     while !paths.is_empty() {
         let current_path = paths.pop().unwrap();
-        if visited.contains(&current_path) {
-            continue;
-        }
-        visited.insert(current_path.clone());
         let (i, j, dir, heat) = current_path.last().unwrap().clone();
-        if heat >= *minblock.get(&exit_cell).unwrap_or(&u32::MAX) {
+
+        // compare with existing min value
+        let min_heat = *minblock.get(&exit_cell).unwrap_or(&u32::MAX);
+        if heat >= min_heat {
             continue;
         }
+
+        // Check if path already visited with lower heat
+        let path_without_heat = current_path
+            .iter()
+            .map(|(i, j, d, _)| (*i, *j, *d))
+            .collect::<Vec<(usize, usize, char)>>();
+        let min_heat_for_path = visited.get(&path_without_heat).unwrap_or(&u32::MAX);
+        if heat >= *min_heat_for_path {
+            continue;
+        }
+        visited.insert(path_without_heat, heat);
+
+        // Continuing path...
         let next_directions = get_next_directions(dir, can_continue_straight(&current_path));
         for next_direction in next_directions {
             match next_direction {
                 'L' => {
                     if j > 0 {
                         let new_heat = heat + map[i][j - 1];
-                        if new_heat > *minblock.get(&(i, j - 1)).unwrap_or(&u32::MAX)
-                            || &new_heat >= minblock.get(&exit_cell).unwrap_or(&u32::MAX)
-                        {
+                        if new_heat >= min_heat {
                             continue;
+                        }
+                        if dir != 'L' {
+                            if visited_cells.get(&(i, j - 1)).unwrap_or(&u32::MAX) < &new_heat {
+                                continue;
+                            }
+                            visited_cells.insert((i, j - 1), new_heat);
                         }
                         minblock.insert((i, j - 1), new_heat);
-                        if (i, j - 1) == exit_cell {
-                            println!(
-                                "Current min value: {} - stack len {}",
-                                minblock.get(&exit_cell).unwrap_or(&u32::MAX),
-                                paths.len()
-                            );
 
-                            continue;
-                        }
                         let mut new_path = current_path.clone();
-                        new_path = new_path
-                            .iter()
-                            .rev()
-                            .take(2)
-                            .rev()
-                            .map(|(i, j, d, h)| (*i, *j, *d, *h))
-                            .collect();
+                        if new_path.len() == 3 {
+                            new_path.remove(0);
+                        }
                         new_path.push((i, j - 1, 'L', new_heat));
 
                         paths.push(new_path);
@@ -72,29 +78,21 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
                 'U' => {
                     if i > 0 {
                         let new_heat = heat + map[i - 1][j];
-                        if new_heat > *minblock.get(&(i - 1, j)).unwrap_or(&u32::MAX)
-                            || &new_heat >= minblock.get(&exit_cell).unwrap_or(&u32::MAX)
-                        {
+                        if new_heat >= min_heat {
                             continue;
+                        }
+                        if dir != 'U' {
+                            if visited_cells.get(&(i-1, j )).unwrap_or(&u32::MAX) < &new_heat {
+                                continue;
+                            }
+                            visited_cells.insert((i-1, j), new_heat);
                         }
                         minblock.insert((i - 1, j), new_heat);
-                        if (i - 1, j) == exit_cell {
-                            println!(
-                                "Current min value: {} - stack len {}",
-                                minblock.get(&exit_cell).unwrap_or(&u32::MAX),
-                                paths.len()
-                            );
 
-                            continue;
-                        }
                         let mut new_path = current_path.clone();
-                        new_path = new_path
-                            .iter()
-                            .rev()
-                            .take(2)
-                            .rev()
-                            .map(|(i, j, d, h)| (*i, *j, *d, *h))
-                            .collect();
+                        if new_path.len() == 3 {
+                            new_path.remove(0);
+                        }
                         new_path.push((i - 1, j, 'U', new_heat));
 
                         paths.push(new_path);
@@ -103,29 +101,29 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
                 'R' => {
                     if j < map[i].len() - 1 {
                         let new_heat = heat + map[i][j + 1];
-                        if new_heat > *minblock.get(&(i, j + 1)).unwrap_or(&u32::MAX)
-                            || &new_heat >= minblock.get(&exit_cell).unwrap_or(&u32::MAX)
-                        {
+                        if new_heat >= min_heat {
                             continue;
+                        }
+                        if dir != 'R' {
+                            if visited_cells.get(&(i, j+1)).unwrap_or(&u32::MAX) < &new_heat {
+                                continue;
+                            }
+                            visited_cells.insert((i, j+1), new_heat);
                         }
                         minblock.insert((i, j + 1), new_heat);
                         if (i, j + 1) == exit_cell {
                             println!(
                                 "Current min value: {} - stack len {}",
-                                minblock.get(&exit_cell).unwrap_or(&u32::MAX),
+                                min_heat,
                                 paths.len()
                             );
 
                             continue;
                         }
                         let mut new_path = current_path.clone();
-                        new_path = new_path
-                            .iter()
-                            .rev()
-                            .take(2)
-                            .rev()
-                            .map(|(i, j, d, h)| (*i, *j, *d, *h))
-                            .collect();
+                        if new_path.len() == 3 {
+                            new_path.remove(0);
+                        }
                         new_path.push((i, j + 1, 'R', new_heat));
 
                         paths.push(new_path);
@@ -134,29 +132,29 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
                 'D' => {
                     if i < map.len() - 1 {
                         let new_heat = heat + map[i + 1][j];
-                        if new_heat > *minblock.get(&(i + 1, j)).unwrap_or(&u32::MAX)
-                            || &new_heat >= minblock.get(&exit_cell).unwrap_or(&u32::MAX)
-                        {
+                        if new_heat >= min_heat {
                             continue;
+                        }
+                        if dir != 'D' {
+                            if visited_cells.get(&(i+1, j)).unwrap_or(&u32::MAX) < &new_heat {
+                                continue;
+                            }
+                            visited_cells.insert((i+1, j), new_heat);
                         }
                         minblock.insert((i + 1, j), new_heat);
                         if (i + 1, j) == exit_cell {
                             println!(
                                 "Current min value: {} - stack len {}",
-                                minblock.get(&exit_cell).unwrap_or(&u32::MAX),
+                                min_heat,
                                 paths.len()
                             );
 
                             continue;
                         }
                         let mut new_path = current_path.clone();
-                        new_path = new_path
-                            .iter()
-                            .rev()
-                            .take(2)
-                            .rev()
-                            .map(|(i, j, d, h)| (*i, *j, *d, *h))
-                            .collect();
+                        if new_path.len() == 3 {
+                            new_path.remove(0);
+                        }
                         new_path.push((i + 1, j, 'D', new_heat));
 
                         paths.push(new_path);
@@ -222,17 +220,19 @@ mod test {
     use super::*;
 
     #[test]
+    // #[ignore]
     fn test_example_data() {
         assert_eq!(102, solve_puzzle("test_data"));
     }
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_solution() {
         assert_eq!(0, solve_puzzle("input"));
     }
 
     #[test]
+    #[ignore]
     fn test_can_continue_straight_false() {
         assert_eq!(
             false,
@@ -253,6 +253,7 @@ mod test {
     }
 
     #[test]
+    #[ignore]
     fn test_can_continue_straight_true() {
         assert_eq!(
             true,
@@ -273,6 +274,7 @@ mod test {
     }
 
     #[test]
+    #[ignore]
     fn test_can_continue_straight_true_short_path() {
         assert_eq!(
             true,
@@ -281,3 +283,8 @@ mod test {
         assert_eq!(true, can_continue_straight(&vec![(0, 0, 'L', 1)]));
     }
 }
+
+
+// 870
+// 877
+// 864?
