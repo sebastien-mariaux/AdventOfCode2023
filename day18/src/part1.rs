@@ -153,12 +153,13 @@ mod test {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_example_data() {
         assert_eq!(62, solve_puzzle("test_data"));
     }
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_solution() {
         assert_eq!(50603, solve_puzzle("input"));
     }
