@@ -198,18 +198,18 @@ fn get_next_directions(dir: char, can_continue_straight: bool) -> Vec<char> {
             }
         }
         'L' => {
-            next_directions.push('U');
-            next_directions.push('D');
             if can_continue_straight {
                 next_directions.push('L');
             }
+            next_directions.push('U');
+            next_directions.push('D');
         }
         'U' => {
             next_directions.push('L');
-            next_directions.push('R');
             if can_continue_straight {
                 next_directions.push('U');
             }
+            next_directions.push('R');
         }
         'D' => {
             next_directions.push('L');
