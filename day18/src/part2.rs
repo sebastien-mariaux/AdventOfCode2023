@@ -1,5 +1,4 @@
 use crate::utils::read_data;
-use std::collections::HashSet;
 
 pub fn solve_puzzle(file_name: &str) -> usize {
     let data = read_data(file_name);
@@ -7,10 +6,10 @@ pub fn solve_puzzle(file_name: &str) -> usize {
     let mut trenches: Vec<(isize, isize)> = Vec::new();
     trenches.push((0, 0));
 
-    let mut sides:Vec<((isize, isize), (isize, isize))> = Vec::new();
+    let mut sides: Vec<((isize, isize), (isize, isize))> = Vec::new();
 
     for line in data.lines() {
-        let  mut instructions = line.split(" ");
+        let mut instructions = line.split(" ");
         instructions.next();
         instructions.next();
         let hexa = instructions.next().unwrap();
@@ -28,130 +27,59 @@ pub fn solve_puzzle(file_name: &str) -> usize {
         let distance = isize::from_str_radix(five_first, 16).unwrap();
         // println!("hexa {} direction: {}, distance: {}", hexa, direction, distance);
 
-
         dig_trenches(&mut sides, direction, distance);
     }
 
     println!("sides: {:?}", sides);
+    let vertices = sides.iter().map(|(s, _)| s).collect::<Vec<_>>();
+    println!("vertices: {:?}", vertices);
 
-    // Fill trench
-    let min_i = trenches.iter().min_by_key(|(x, _)| x).unwrap().0;
-    let max_i = trenches.iter().max_by_key(|(x, _)| x).unwrap().0;
-    let min_j = trenches.iter().min_by_key(|(_, y)| y).unwrap().1;
-    let max_j = trenches.iter().max_by_key(|(_, y)| y).unwrap().1;
-    // println!("trenches: {:?}", trenches);
-    // println!("min_i: {}, max_i: {}, min_j: {}, max_j: {}", min_i, max_i, min_j, max_j);
+    let xs = vertices.iter().map(|(x, _)| x).collect::<Vec<_>>();
+    let ys = vertices.iter().map(|(_, y)| y).collect::<Vec<_>>();
+    println!("xs: {:?}", xs);
+    println!("ys: {:?}", ys);
+    println!("length of sides {}", sides.len());
+    println!("length of vertices {}", vertices.len());
 
-    // let mut fill: HashSet<(isize, isize)> = HashSet::new();
-    // let mut insiders: HashSet<(isize, isize)> = HashSet::new();
-    let mut outsiders: HashSet<(isize, isize)> = HashSet::new();
+    let mut ys_changed = ys.clone();
+    let last_element = ys_changed.remove(0);
+    ys_changed.push(last_element);
 
-    for i in min_i..=max_i {
-        for j in min_j..=max_j {
-            if (i == min_i || i == max_i || j == min_j || j == max_j) && !trenches.contains(&(i, j)) {
-                outsiders.insert((i, j));
-            }
-        }
-    }
+    let mut xs_changed = xs.clone();
+    let last_element = xs_changed.remove(0);
+    xs_changed.push(last_element);
+    println!("ys_changed: {:?}", ys_changed);
+    println!("xs_changed: {:?}", xs_changed);
 
+    let first_sum: isize = xs
+        .iter()
+        .zip(ys_changed.iter())
+        .map(|(x, y)| **x * **y)
+        .sum();
+    let second_sum: isize = ys
+        .iter()
+        .zip(xs_changed.iter())
+        .map(|(y, x)| **y * **x)
+        .sum();
 
-    let mut stack: Vec<(isize, isize)> = outsiders.iter()
-    .map(|(i,j)| (*i, *j))
-    .collect::<Vec<_>>();
-    let mut visited: HashSet<(isize, isize)> = HashSet::new();
+    let result = 0.5 * ((first_sum - second_sum).abs() as f64);
 
-    while !stack.is_empty() {
-        let point = stack.pop().unwrap();
-        if visited.contains(&point) {
-            continue;
-        }
-        let neighbors: Vec<(isize, isize)> = vec![
-            (point.0 - 1, point.1),
-            (point.0 + 1, point.1),
-            (point.0, point.1 - 1),
-            (point.0, point.1 + 1),
-        ].iter().filter(|(ii,jj)|  {
-            ii >= &min_i && ii <= &max_i && jj >= &min_j && jj <= &max_j && !trenches.contains(&(*ii, *jj))
-        })
-        .map(|(ii,jj)| (*ii, *jj))
-        .collect();
-        outsiders.extend(neighbors.clone());
-        stack.extend(neighbors.clone());
-        visited.insert(point);
-    }
+    let perimeter = sides
+        .iter()
+        .map(|(s, e)| (s.0 - e.0).abs() + (s.1 - e.1).abs())
+        .sum::<isize>();
+    println!("perimeter: {}", perimeter);
+    println!("result: {}", result);
 
-    // println!("outsiders: {:?}", outsiders);
-
-    let mut result = trenches.len() as usize;
-    for i in min_i..=max_i {
-        for j in min_j..=max_j {
-            if !outsiders.contains(&(i, j)) && !trenches.contains(&(i, j)) {
-                result += 1;
-            }
-        }
-    }
-
-
-
-
-    //print map
-    // for i in min_i..=max_i {
-    //     for j in min_j..=max_j {
-    //         if trenches.contains(&(i, j)) {
-    //             print!("X");
-    //         } else if fill.contains(&(i, j)) {
-    //             print!("O");
-    //         } else {
-    //             print!(".");
-    //         }
-    //     }
-    //     println!();
-    // }
-
-    result
+    result as usize + (perimeter as f64 / 2.0) as usize + 1
 }
 
-// fn is_inside_trench(trenches: &Vec<(isize, isize)>, point: &(isize, isize), insiders: &mut Vec<(isize, isize)>, outsiders: &mut Vec<(isize, isize)>) -> bool {
-//     if outsiders.contains(point) {
-//         return false;
-//     }
-
-//     if insiders.contains(point) {
-//         return true;
-//     }
-
-//     let min_i = trenches.iter().min_by_key(|(x, _)| x).unwrap().0;
-//     let max_i = trenches.iter().max_by_key(|(x, _)| x).unwrap().0;
-//     let min_j = trenches.iter().min_by_key(|(_, y)| y).unwrap().1;
-//     let max_j = trenches.iter().max_by_key(|(_, y)| y).unwrap().1;
-//     let (i,j) = *point;
-
-//     if i == min_i || i == max_i || j == min_j || j == max_j {
-//         outsiders.push(*point);
-//         return false;
-//     }
-
-//     let neighbors = vec![
-//         (point.0 - 1, point.1),
-//         (point.0 + 1, point.1),
-//         (point.0, point.1 - 1),
-//         (point.0, point.1 + 1),
-//     ];
-
-//     for neighbor in neighbors.iter().filter(|n| !trenches.contains(n)) {
-//         if !is_inside_trench(trenches, &neighbor, insiders, outsiders) {
-//             outsiders.push(*point);
-//             return false;
-//         }
-
-//     }
-//     insiders.push(*point);
-//     true
-
-// }
-
-fn dig_trenches(sides: &mut Vec<((isize, isize), (isize, isize))>, direction: &str, distance: isize) {
-    let mut last_angle;
+fn dig_trenches(
+    sides: &mut Vec<((isize, isize), (isize, isize))>,
+    direction: &str,
+    distance: isize,
+) {
+    let last_angle;
     if sides.is_empty() {
         last_angle = (0, 0);
     } else {
@@ -175,8 +103,6 @@ fn dig_trenches(sides: &mut Vec<((isize, isize), (isize, isize))>, direction: &s
         _ => panic!("Unknown direction: {}", direction),
     }
     sides.push((last_angle, new_angle));
-
-
 }
 
 #[cfg(test)]
@@ -189,8 +115,8 @@ mod test {
     }
 
     #[test]
-    #[ignore]
+    // #[ignore]
     fn test_solution() {
-        assert_eq!(1, solve_puzzle("input"));
+        assert_eq!(96556251590677, solve_puzzle("input"));
     }
 }
