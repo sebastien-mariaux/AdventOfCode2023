@@ -4,27 +4,20 @@ use std::collections::HashSet;
 pub fn solve_puzzle(file_name: &str) -> u32 {
     let data = read_data(file_name);
 
-    let mut trenches: Vec<(isize, isize)> = Vec::new();
-    trenches.push((0, 0));
-
-    for line in data.lines() {
-        let mut instructions = line.split(" ");
+    let trenches = data.lines().fold(Vec::new(), |mut acc, line| {
+        let mut instructions = line.split(' ');
         let direction = instructions.next().unwrap();
         let distance = instructions.next().unwrap().parse::<isize>().unwrap();
 
-        dig_trenches(&mut trenches, direction, distance);
-    }
+        dig_trenches(&mut acc, direction, distance);
+        acc
+    });
 
     // Fill trench
     let min_i = trenches.iter().min_by_key(|(x, _)| x).unwrap().0;
     let max_i = trenches.iter().max_by_key(|(x, _)| x).unwrap().0;
     let min_j = trenches.iter().min_by_key(|(_, y)| y).unwrap().1;
     let max_j = trenches.iter().max_by_key(|(_, y)| y).unwrap().1;
-    println!("trenches: {:?}", trenches);
-    println!(
-        "min_i: {}, max_i: {}, min_j: {}, max_j: {}",
-        min_i, max_i, min_j, max_j
-    );
 
     let mut outsiders: HashSet<(isize, isize)> = HashSet::new();
 
@@ -37,16 +30,18 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
         }
     }
 
-    let mut stack: Vec<(isize, isize)> =
-        outsiders.iter().map(|(i, j)| (*i, *j)).collect::<Vec<_>>();
+    let mut stack = outsiders
+        .iter()
+        .map(|(i, j)| (*i, *j))
+        .collect::<Vec<(isize, isize)>>();
+
     let mut visited: HashSet<(isize, isize)> = HashSet::new();
 
-    while !stack.is_empty() {
-        let point = stack.pop().unwrap();
+    while let Some(point) = stack.pop() {
         if visited.contains(&point) {
             continue;
         }
-        let neighbors: Vec<(isize, isize)> = vec![
+        let neighbors: Vec<(isize, isize)> = [
             (point.0 - 1, point.1),
             (point.0 + 1, point.1),
             (point.0, point.1 - 1),
@@ -67,8 +62,6 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
         visited.insert(point);
     }
 
-    println!("outsiders: {:?}", outsiders);
-
     let mut result = trenches.len() as u32;
     for i in min_i..=max_i {
         for j in min_j..=max_j {
@@ -82,7 +75,11 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
 }
 
 fn dig_trenches(trenches: &mut Vec<(isize, isize)>, direction: &str, distance: isize) {
-    let mut new_trench = trenches.last().unwrap().clone();
+    let mut new_trench = if trenches.is_empty() {
+        (0_isize, 0_isize)
+    } else {
+        *trenches.last().unwrap()
+    };
 
     for _ in 0..distance {
         match direction {
@@ -91,9 +88,9 @@ fn dig_trenches(trenches: &mut Vec<(isize, isize)>, direction: &str, distance: i
             "R" => new_trench.1 += 1,
             "L" => new_trench.1 -= 1,
             _ => panic!("Unknown direction: {}", direction),
-        }
+        };
         if !trenches.contains(&new_trench) {
-            trenches.push(new_trench.clone());
+            trenches.push(new_trench);
         }
     }
 }
@@ -103,13 +100,11 @@ mod test {
     use super::*;
 
     #[test]
-    // #[ignore]
     fn test_example_data() {
         assert_eq!(62, solve_puzzle("test_data"));
     }
 
     #[test]
-    // #[ignore]
     fn test_solution() {
         assert_eq!(50603, solve_puzzle("input"));
     }
