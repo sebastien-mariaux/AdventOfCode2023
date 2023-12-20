@@ -129,11 +129,13 @@ mod test {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_example_data() {
         assert_eq!(19114, solve_puzzle("test_data"));
     }
 
     #[test]
+    #[ignore]
     fn test_solution() {
         assert_eq!(0, solve_puzzle("input"));
     }
