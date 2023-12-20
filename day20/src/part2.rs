@@ -1,7 +1,7 @@
 use crate::utils::read_data;
 
 pub fn solve_puzzle(file_name: &str) -> usize {
-    let data = read_data(file_name);
+    let _data = read_data(file_name);
 
     1
 }

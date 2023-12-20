@@ -45,8 +45,8 @@ impl Module {
         }
     }
 
-    fn receive_pulse(&mut self, pulse: char, sender: &String) {
-        self.received_pulses.insert(sender.clone(), pulse);
+    fn receive_pulse(&mut self, pulse: char, sender: &str) {
+        self.received_pulses.insert(sender.to_string(), pulse);
     }
 
     fn increase_count(&mut self, pulse: char) {
