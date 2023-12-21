@@ -6,30 +6,33 @@ pub fn solve_puzzle(file_name: &str, steps: u32) -> u32 {
     let data = read_data(file_name);
 
     let map = data
-    .lines()
-    .map(|line| {
-        line.chars().collect::<Vec<char>>()
-    }).collect::<Vec<Vec<char>>>();
+        .lines()
+        .map(|line| line.chars().collect::<Vec<char>>())
+        .collect::<Vec<Vec<char>>>();
 
-    let start: (usize, usize) = map.iter().enumerate().find_map(|(y, row)| {
-        row.iter().enumerate().find_map(|(x, cell)| {
-            if *cell == 'S' {
-                Some((x, y))
-            } else {
-                None
-            }
+    let start: (usize, usize) = map
+        .iter()
+        .enumerate()
+        .find_map(|(y, row)| {
+            row.iter().enumerate().find_map(
+                |(x, cell)| {
+                    if *cell == 'S' {
+                        Some((x, y))
+                    } else {
+                        None
+                    }
+                },
+            )
         })
-    }).unwrap();
+        .unwrap();
 
-    // let mut visited: HashSet<(usize, usize)> = HashSet::new();
     let mut starts: HashSet<(usize, usize)> = HashSet::from([start]);
 
     for _ in 0..steps {
         let mut next_starts = HashSet::new();
         println!("Starts {:?}", starts);
         for start in &starts {
-            let next_cells  = get_next_cells(&map, *start);
-            // visited.insert(*start);
+            let next_cells = get_next_cells(&map, *start);
             next_starts.extend(next_cells);
         }
         starts = next_starts;
@@ -38,23 +41,21 @@ pub fn solve_puzzle(file_name: &str, steps: u32) -> u32 {
     starts.len() as u32
 }
 
-fn get_next_cells(map: &Vec<Vec<char>>, start: (usize, usize),
-    // visited: &HashSet<(usize, usize)>
-) -> Vec<(usize, usize)> {
+fn get_next_cells(map: &Vec<Vec<char>>, start: (usize, usize)) -> Vec<(usize, usize)> {
     let mut next_cells: Vec<(usize, usize)> = Vec::new();
 
     let (i, j) = start;
 
-    if i > 0 && map[i-1][j] != '#'  {
+    if i > 0 && map[i - 1][j] != '#' {
         next_cells.push((i - 1, j));
     }
-    if i < map.len() - 1 && map[i+1][j] != '#'  {
+    if i < map.len() - 1 && map[i + 1][j] != '#' {
         next_cells.push((i + 1, j));
     }
-    if j > 0 && map[i][j-1] != '#'  {
+    if j > 0 && map[i][j - 1] != '#' {
         next_cells.push((i, j - 1));
     }
-    if j < map.len() - 1 && map[i][j+1] != '#'  {
+    if j < map.len() - 1 && map[i][j + 1] != '#' {
         next_cells.push((i, j + 1));
     }
 
