@@ -1,7 +1,7 @@
 use crate::utils::read_data;
+use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::fmt;
-use std::collections::HashMap;
 
 struct Module {
     mod_type: char,
@@ -67,7 +67,6 @@ impl Module {
         stack.push_back((target.to_string(), pulse));
         sent_pulses.push((target.to_string(), pulse));
         self.increase_count(pulse);
-        println!("{} -> {} ({})", self.name, target, pulse);
     }
 
     fn process_pulse(
@@ -91,7 +90,6 @@ impl Module {
                 self.toggle();
             }
         } else if self.mod_type == '&' {
-            println!("Received pulses: {:?}", self.received_pulses);
             if self.received_pulses.values().all(|x| x == &'H') {
                 for target in self.targets.clone() {
                     self.send_pulse('L', target.to_string(), stack, &mut sent_pulses);
@@ -161,7 +159,6 @@ pub fn solve_puzzle(file_name: &str) -> usize {
                 Some(module) => {
                     let sent_pulses = module.process_pulse(&mut stack, pulse);
                     for (target, pulse) in sent_pulses {
-                        println!("debug {} -> {} ({})", name, target, pulse);
                         let target_module = modules.get_mut(&target);
                         if let Some(target_module) = target_module {
                             target_module.receive_pulse(pulse, &name);
@@ -179,8 +176,6 @@ pub fn solve_puzzle(file_name: &str) -> usize {
     let high_pulses_count: usize = modules.values().map(|x| x.high_pulse_count).sum();
     let low_pulses_count: usize = modules.values().map(|x| x.low_pulse_count).sum();
 
-    println!("High pulses: {}", high_pulses_count);
-    println!("Low pulses: {}", low_pulses_count);
     high_pulses_count * low_pulses_count
 }
 
@@ -194,17 +189,12 @@ mod test {
     }
 
     #[test]
-    // #[ignore]
     fn test_example_data_2() {
         assert_eq!(11687500, solve_puzzle("test_data_2"));
     }
 
     #[test]
-    // #[ignore]
     fn test_solution() {
         assert_eq!(812609846, solve_puzzle("input"));
     }
 }
-
-// % are off -> low pulse -> toggle on off. toggle to on -> send high pulse. toggle to off -> send low pulse
-// & remember last pulse (initial low) Then, if it remembers high pulses for all inputs, it sends a low pulse; otherwise, it sends a high pulse.
