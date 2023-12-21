@@ -30,7 +30,6 @@ pub fn solve_puzzle(file_name: &str, steps: u32) -> u32 {
 
     for _ in 0..steps {
         let mut next_starts = HashSet::new();
-        println!("Starts {:?}", starts);
         for start in &starts {
             let next_cells = get_next_cells(&map, *start);
             next_starts.extend(next_cells);
