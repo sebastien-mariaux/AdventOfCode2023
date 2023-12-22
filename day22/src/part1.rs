@@ -112,7 +112,6 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
     let mut cubes = data
         .lines()
         .map(|line| {
-            println!("{}", line);
             let (start, end) = line.split_once('~').unwrap();
             let (x, y, z) = start
                 .splitn(3, ',')
@@ -129,14 +128,12 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
         .collect::<Vec<Cube>>();
 
     cubes.sort();
-    println!("{:?}", cubes);
 
     for i in 0..cubes.len() {
         let cubes_ref = cubes.clone();
         let cube = &mut cubes.get_mut(i).unwrap();
         cube.settle_at_next_support_level(&cubes_ref);
     }
-    println!("{:?}", cubes);
 
     let cubes_copy = cubes.clone();
     cubes.iter().filter(|c| c.can_destroy(&cubes_copy)).count() as u32
@@ -152,8 +149,7 @@ mod test {
     }
 
     #[test]
-    // #[ignore]
     fn test_solution() {
-        assert_eq!(0, solve_puzzle("input"));
+        assert_eq!(515, solve_puzzle("input"));
     }
 }
