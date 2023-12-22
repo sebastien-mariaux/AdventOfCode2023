@@ -24,9 +24,8 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
     let mut paths: Vec<Vec<(usize, usize, char, u32)>> = Vec::new();
     paths.push(vec![(0, 0, 'S', 0)]);
 
-    while !paths.is_empty() {
-        let current_path = paths.pop().unwrap();
-        let (i, j, dir, heat) = current_path.last().unwrap().clone();
+    while let Some(current_path) = paths.pop() {
+        let (i, j, dir, heat) = *current_path.last().unwrap();
 
         // compare with existing min value
         let min_heat = *minblock.get(&exit_cell).unwrap_or(&u32::MAX);
@@ -170,10 +169,7 @@ pub fn solve_puzzle(file_name: &str) -> u32 {
         }
     }
 
-    minblock
-        .get(&(&map.len() - 1, &map[0].len() - 1))
-        .unwrap()
-        .clone()
+    *minblock.get(&(&map.len() - 1, &map[0].len() - 1)).unwrap()
 }
 
 fn can_continue_straight(path: &Vec<(usize, usize, char, u32)>) -> bool {
@@ -243,50 +239,55 @@ mod test {
 
     #[test]
     fn test_can_continue_straight_false() {
-        assert_eq!(
-            false,
-            can_continue_straight(&vec![(0, 0, 'R', 1), (0, 1, 'R', 1), (0, 2, 'R', 1)])
-        );
-        assert_eq!(
-            false,
-            can_continue_straight(&vec![(0, 0, 'U', 1), (0, 1, 'U', 1), (0, 2, 'U', 1)])
-        );
-        assert_eq!(
-            false,
-            can_continue_straight(&vec![(0, 0, 'D', 1), (0, 1, 'D', 1), (0, 2, 'D', 1)])
-        );
-        assert_eq!(
-            false,
-            can_continue_straight(&vec![(0, 0, 'L', 1), (0, 1, 'L', 1), (0, 2, 'L', 1)])
-        );
+        assert!(!can_continue_straight(&vec![
+            (0, 0, 'R', 1),
+            (0, 1, 'R', 1),
+            (0, 2, 'R', 1)
+        ]));
+        assert!(!can_continue_straight(&vec![
+            (0, 0, 'U', 1),
+            (0, 1, 'U', 1),
+            (0, 2, 'U', 1)
+        ]));
+        assert!(!can_continue_straight(&vec![
+            (0, 0, 'D', 1),
+            (0, 1, 'D', 1),
+            (0, 2, 'D', 1)
+        ]));
+        assert!(!can_continue_straight(&vec![
+            (0, 0, 'L', 1),
+            (0, 1, 'L', 1),
+            (0, 2, 'L', 1)
+        ]));
     }
 
     #[test]
     fn test_can_continue_straight_true() {
-        assert_eq!(
-            true,
-            can_continue_straight(&vec![(0, 0, 'L', 1), (0, 1, 'R', 1), (0, 2, 'R', 1)])
-        );
-        assert_eq!(
-            true,
-            can_continue_straight(&vec![(0, 0, 'U', 1), (0, 1, 'U', 1), (0, 2, 'R', 1)])
-        );
-        assert_eq!(
-            true,
-            can_continue_straight(&vec![(0, 0, 'L', 1), (0, 1, 'D', 1), (0, 2, 'D', 1)])
-        );
-        assert_eq!(
-            true,
-            can_continue_straight(&vec![(0, 0, 'L', 1), (0, 1, 'U', 1), (0, 2, 'R', 1)])
-        );
+        assert!(can_continue_straight(&vec![
+            (0, 0, 'L', 1),
+            (0, 1, 'R', 1),
+            (0, 2, 'R', 1)
+        ]));
+        assert!(can_continue_straight(&vec![
+            (0, 0, 'U', 1),
+            (0, 1, 'U', 1),
+            (0, 2, 'R', 1)
+        ]));
+        assert!(can_continue_straight(&vec![
+            (0, 0, 'L', 1),
+            (0, 1, 'D', 1),
+            (0, 2, 'D', 1)
+        ]));
+        assert!(can_continue_straight(&vec![
+            (0, 0, 'L', 1),
+            (0, 1, 'U', 1),
+            (0, 2, 'R', 1)
+        ]));
     }
 
     #[test]
     fn test_can_continue_straight_true_short_path() {
-        assert_eq!(
-            true,
-            can_continue_straight(&vec![(0, 0, 'L', 1), (0, 1, 'L', 1)])
-        );
-        assert_eq!(true, can_continue_straight(&vec![(0, 0, 'L', 1)]));
+        assert!(can_continue_straight(&vec![(0, 0, 'L', 1), (0, 1, 'L', 1)]));
+        assert!(can_continue_straight(&vec![(0, 0, 'L', 1)]));
     }
 }

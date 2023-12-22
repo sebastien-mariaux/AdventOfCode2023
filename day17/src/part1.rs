@@ -70,65 +70,59 @@ fn get_next_points(
     match dir {
         'R' => {
             if i > 0 {
-                let next_value = heat + map[i as usize - 1][j as usize];
+                let next_value = heat + map[i - 1][j];
                 if next_value < *min_value {
                     next_points.push((i - 1, j, 'U', 1, next_value));
                 }
             }
-            if i < map.len() as usize - 1 {
-                let next_value = heat + map[i as usize + 1][j as usize];
+            if i < map.len() - 1 {
+                let next_value = heat + map[i + 1][j];
                 if next_value < *min_value {
                     next_points.push((i + 1, j, 'D', 1, next_value));
                 }
             }
-            if can_continue_straight {
-                if j < map[0].len() as usize - 1 {
-                    let next_value = heat + map[i as usize][j as usize + 1];
-                    if next_value < *min_value {
-                        next_points.push((i, j + 1, 'R', steps_count + 1, next_value));
-                    }
+            if can_continue_straight && j < map[0].len() - 1 {
+                let next_value = heat + map[i][j + 1];
+                if next_value < *min_value {
+                    next_points.push((i, j + 1, 'R', steps_count + 1, next_value));
                 }
             }
         }
         'L' => {
-            if can_continue_straight {
-                if j > 0 {
-                    let next_value = heat + map[i as usize][j as usize - 1];
-                    if next_value < *min_value {
-                        next_points.push((i, j - 1, 'L', steps_count + 1, next_value));
-                    }
+            if can_continue_straight && j > 0 {
+                let next_value = heat + map[i][j - 1];
+                if next_value < *min_value {
+                    next_points.push((i, j - 1, 'L', steps_count + 1, next_value));
                 }
             }
             if i > 0 {
-                let next_value = heat + map[i as usize - 1][j as usize];
+                let next_value = heat + map[i - 1][j];
                 if next_value < *min_value {
                     next_points.push((i - 1, j, 'U', 1, next_value));
                 }
             }
-            if i < map.len() as usize - 1 {
-                let next_value = heat + map[i as usize + 1][j as usize];
+            if i < map.len() - 1 {
+                let next_value = heat + map[i + 1][j];
                 if next_value < *min_value {
                     next_points.push((i + 1, j, 'D', 1, next_value));
                 }
             }
         }
         'U' => {
-            if can_continue_straight {
-                if i > 0 {
-                    let next_value = heat + map[i as usize - 1][j as usize];
-                    if next_value < *min_value {
-                        next_points.push((i - 1, j, 'U', steps_count + 1, next_value));
-                    }
+            if can_continue_straight && i > 0 {
+                let next_value = heat + map[i - 1][j];
+                if next_value < *min_value {
+                    next_points.push((i - 1, j, 'U', steps_count + 1, next_value));
                 }
             }
             if j > 0 {
-                let next_value = heat + map[i as usize][j as usize - 1];
+                let next_value = heat + map[i][j - 1];
                 if next_value < *min_value {
                     next_points.push((i, j - 1, 'L', 1, next_value));
                 }
             }
-            if j < map[0].len() as usize - 1 {
-                let next_value = heat + map[i as usize][j as usize + 1];
+            if j < map[0].len() - 1 {
+                let next_value = heat + map[i][j + 1];
                 if next_value < *min_value {
                     next_points.push((i, j + 1, 'R', 1, next_value));
                 }
@@ -136,30 +130,28 @@ fn get_next_points(
         }
         'D' => {
             if j > 0 {
-                let next_value = heat + map[i as usize][j as usize - 1];
+                let next_value = heat + map[i][j - 1];
                 if next_value < *min_value {
                     next_points.push((i, j - 1, 'L', 1, next_value));
                 }
             }
-            if j < map[0].len() as usize - 1 {
-                let next_value = heat + map[i as usize][j as usize + 1];
+            if j < map[0].len() - 1 {
+                let next_value = heat + map[i][j + 1];
                 if next_value < *min_value {
                     next_points.push((i, j + 1, 'R', 1, next_value));
                 }
             }
-            if can_continue_straight {
-                if i < map.len() as usize - 1 {
-                    let next_value = heat + map[i as usize + 1][j as usize];
-                    if next_value < *min_value {
-                        next_points.push((i + 1, j, 'D', steps_count + 1, next_value));
-                    }
+            if can_continue_straight && i < map.len() - 1 {
+                let next_value = heat + map[i + 1][j];
+                if next_value < *min_value {
+                    next_points.push((i + 1, j, 'D', steps_count + 1, next_value));
                 }
             }
         }
         // Starting point
         'S' => {
-            next_points.push((i, j + 1, 'R', 1, heat + map[i as usize][j as usize + 1]));
-            next_points.push((i + 1, j, 'D', 1, heat + map[i as usize + 1][j as usize]));
+            next_points.push((i, j + 1, 'R', 1, heat + map[i][j + 1]));
+            next_points.push((i + 1, j, 'D', 1, heat + map[i + 1][j]));
         }
         _ => panic!("Unknown direction"),
     }
