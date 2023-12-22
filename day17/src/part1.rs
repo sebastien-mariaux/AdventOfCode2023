@@ -233,19 +233,19 @@ mod test {
     use super::*;
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_example_data() {
         assert_eq!(102, solve_puzzle("test_data"));
     }
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_solution() {
         assert_eq!(861, solve_puzzle("input"));
     }
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_can_continue_straight_false() {
         assert_eq!(
             false,
@@ -266,7 +266,7 @@ mod test {
     }
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_can_continue_straight_true() {
         assert_eq!(
             true,

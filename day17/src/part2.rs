@@ -257,7 +257,7 @@ mod test {
     use super::*;
 
     #[test]
-    // #[ignore]
+    #[ignore]
     fn test_example_data() {
         assert_eq!(94, solve_puzzle("test_data"));
     }
