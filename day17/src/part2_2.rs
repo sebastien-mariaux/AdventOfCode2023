@@ -25,22 +25,26 @@ pub fn solve_puzzle(file_name: &str) -> usize {
     stack.push(start);
 
     while !stack.is_empty() {
+        if min_value < usize::MAX {
+            stack = stack.iter().filter(|(_, _, _, _, heat)| heat < &min_value).cloned().collect();
+        }
+        stack.sort_by(|(_, _, _, _, heat1), (_, _, _, _, heat2)| heat2.cmp(heat1));
         println!("Stack : {} - Min: {}", stack.len(), min_value);
+        // let next_position = stack.iter().position(|x| x.2 == 'R' || x.2 == 'D');
 
-        stack.sort_by(|(_, _, _, _, heat1), (_, _, _, _, heat2)| heat1.cmp(heat2));
-        let next_position = stack.iter().position(|x| x.2 == 'R' || x.2 == 'D');
+        // let (i, j, dir, steps_count, heat) = if let Some(next_position) = next_position {
+        //     stack.remove(next_position)
+        // } else {
+        //     stack.pop().unwrap()
+        // };
 
-        let (i, j, dir, steps_count, heat) = if let Some(next_position) = next_position {
-            stack.remove(next_position)
-        } else {
-            stack.pop().unwrap()
-        };
-        
-        let next_points = get_next_points(&map, i, j, dir, steps_count, heat);
+        let (ii, jj, diir, sterps_count, heeat) = stack.pop().unwrap();
+        if heeat >= min_value {
+            continue;
+        }
+
+        let next_points = get_next_points(&map, ii, jj, diir, sterps_count, heeat, &min_value);
         for (i, j, dir, steps_count, heat) in next_points {
-            if heat >= min_value {
-                continue;
-            }
             if (i, j) == exit_cell && steps_count >= 4 {
                 min_value = min_value.min(heat);
                 println!("Min value: {}", min_value);
@@ -60,7 +64,7 @@ pub fn solve_puzzle(file_name: &str) -> usize {
  min_value
 }
 
-fn get_next_points(map: &Vec<Vec<usize>>, i: usize, j: usize, dir: char, steps_count: usize, heat: usize) -> Vec<(usize, usize, char, usize, usize)> {
+fn get_next_points(map: &Vec<Vec<usize>>, i: usize, j: usize, dir: char, steps_count: usize, heat: usize, min_value: &usize) -> Vec<(usize, usize, char, usize, usize)> {
     let mut next_points = Vec::new();
 
     let can_turn = steps_count >= 4;
@@ -70,60 +74,96 @@ fn get_next_points(map: &Vec<Vec<usize>>, i: usize, j: usize, dir: char, steps_c
         'R' => {
             if can_turn {
                 if i > 0 {
-                    next_points.push((i - 1, j, 'U', 1, heat + map[i as usize - 1][j as usize]));
+                    let next_value = heat + map[i as usize - 1][j as usize];
+                    if next_value < *min_value {
+                        next_points.push((i - 1, j, 'U', 1, next_value));
+                    }
                 }
                 if i < map.len() as usize - 1 {
-                    next_points.push((i + 1, j, 'D', 1, heat + map[i as usize + 1][j as usize]));
+                    let next_value = heat + map[i as usize + 1][j as usize];
+                    if next_value < *min_value {
+                        next_points.push((i + 1, j, 'D', 1, next_value));
+                    }
                 }
             }
             if can_continue_straight {
                 if j < map[0].len() as usize - 1 {
-                    next_points.push((i, j + 1, 'R', steps_count + 1, heat + map[i as usize][j as usize + 1]));
+                    let next_value = heat + map[i as usize][j as usize + 1];
+                    if next_value < *min_value {
+                        next_points.push((i, j + 1, 'R', steps_count + 1, next_value));
+                    }
                 }
             }
         }
         'L' => {
             if can_continue_straight {
                 if j > 0 {
-                    next_points.push((i, j - 1, 'L', steps_count + 1, heat + map[i as usize][j as usize - 1]));
+                    let next_value = heat + map[i as usize][j as usize - 1];
+                    if next_value < *min_value {
+                        next_points.push((i, j - 1, 'L', steps_count + 1, next_value));
+                    }
                 }
             }
             if can_turn {
                 if i > 0 {
-                    next_points.push((i - 1, j, 'U', 1, heat + map[i as usize - 1][j as usize]));
+                    let next_value = heat + map[i as usize - 1][j as usize];
+                    if next_value < *min_value {
+                        next_points.push((i - 1, j, 'U', 1, next_value));
+                    }
                 }
                 if i < map.len() as usize - 1 {
-                    next_points.push((i + 1, j, 'D', 1, heat + map[i as usize + 1][j as usize]));
+                    let next_value = heat + map[i as usize + 1][j as usize];
+                    if next_value < *min_value {
+                        next_points.push((i + 1, j, 'D', 1, next_value));
+                    }
                 }
             }
         }
         'U' => {
             if can_continue_straight {
                 if i > 0 {
-                    next_points.push((i - 1, j, 'U', steps_count + 1, heat + map[i as usize - 1][j as usize]));
+                    let next_value = heat + map[i as usize - 1][j as usize];
+                    if next_value < *min_value {
+                        next_points.push((i - 1, j, 'U', steps_count + 1, next_value));
+                    }
                 }
             }
             if can_turn {
                 if j > 0 {
-                    next_points.push((i, j - 1, 'L', 1, heat + map[i as usize][j as usize - 1]));
+                    let next_value = heat + map[i as usize][j as usize - 1];
+                    if next_value < *min_value {
+                        next_points.push((i, j - 1, 'L', 1, next_value));
+                    }
                 }
                 if j < map[0].len() as usize - 1 {
-                    next_points.push((i, j + 1, 'R', 1, heat + map[i as usize][j as usize + 1]));
+                    let next_value = heat + map[i as usize][j as usize + 1];
+                    if next_value < *min_value {
+                        next_points.push((i, j + 1, 'R', 1, next_value));
+                    }
                 }
             }
         }
         'D' => {
             if can_turn {
                 if j > 0 {
-                    next_points.push((i, j - 1, 'L', 1, heat + map[i as usize][j as usize - 1]));
+                    let next_value = heat + map[i as usize][j as usize - 1];
+                    if next_value < *min_value {
+                        next_points.push((i, j - 1, 'L', 1, next_value));
+                    }
                 }
                 if j < map[0].len() as usize - 1 {
-                    next_points.push((i, j + 1, 'R', 1, heat + map[i as usize][j as usize + 1]));
+                    let next_value = heat + map[i as usize][j as usize + 1];
+                    if next_value < *min_value {
+                        next_points.push((i, j + 1, 'R', 1, next_value));
+                    }
                 }
             }
             if can_continue_straight {
                 if i < map.len() as usize - 1 {
-                    next_points.push((i + 1, j, 'D', steps_count + 1, heat + map[i as usize + 1][j as usize]));
+                    let next_value = heat + map[i as usize + 1][j as usize];
+                    if next_value < *min_value {
+                        next_points.push((i + 1, j, 'D', steps_count + 1, next_value));
+                    }
                 }
             }
         }
@@ -227,7 +267,7 @@ mod test {
     #[test]
     #[ignore]
     fn test_solution() {
-        assert_eq!(0, solve_puzzle("input"));
+        assert_eq!(1037, solve_puzzle("input"));
     }
 
 }
