@@ -23,7 +23,7 @@ impl Cube {
         }
     }
 
-    pub fn has_settled(&self, cubes: &Vec<Cube>) -> bool {
+    pub fn has_settled(&self, cubes: &[Cube]) -> bool {
         self.z == 1
             || cubes
                 .iter()
@@ -40,7 +40,7 @@ impl Cube {
         self.zz = z + height;
     }
 
-    fn next_support_level(&self, cubes: &Vec<Cube>) -> u32 {
+    fn next_support_level(&self, cubes: &[Cube]) -> u32 {
         cubes
             .iter()
             .filter(|other| other.zz < self.z && self.superposed(other))
@@ -50,14 +50,14 @@ impl Cube {
             + 1
     }
 
-    pub fn settle_at_next_support_level(&mut self, cubes: &Vec<Cube>) {
+    pub fn settle_at_next_support_level(&mut self, cubes: &[Cube]) {
         if self.has_settled(cubes) {
             return;
         }
         self.settle_at_z(self.next_support_level(cubes));
     }
 
-    fn has_several_support(&self, cubes: &Vec<Cube>) -> bool {
+    fn has_several_support(&self, cubes: &[Cube]) -> bool {
         cubes
             .iter()
             .filter(|other| other.zz == self.z - 1 && self.superposed(other))
@@ -65,15 +65,21 @@ impl Cube {
             > 1
     }
 
-    pub fn can_destroy(&self, cubes: &Vec<Cube>) -> bool {
-        if !cubes.iter().any(|other| other.z == self.z + 1 && self.superposed(other)) {
+    pub fn can_destroy(&self, cubes: &[Cube]) -> bool {
+        if !cubes
+            .iter()
+            .any(|other| other.z == self.zz + 1 && self.superposed(other))
+        {
             return true;
         }
         let supported_cubes = cubes
             .iter()
             .filter(|other| other.z == self.zz + 1 && self.superposed(other))
             .collect::<Vec<&Cube>>();
-        if supported_cubes.iter().all(|cube| cube.has_several_support(cubes)) {
+        if supported_cubes
+            .iter()
+            .all(|cube| cube.has_several_support(cubes))
+        {
             return true;
         }
         false
