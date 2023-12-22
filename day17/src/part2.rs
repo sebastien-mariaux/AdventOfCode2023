@@ -2,43 +2,33 @@ use std::collections::HashMap;
 
 use crate::utils::read_data;
 
-pub fn solve_puzzle(file_name: &str) -> usize {
+pub fn solve_puzzle(file_name: &str) -> u16 {
     let data = read_data(file_name);
 
     let map = data
         .lines()
         .map(|line| {
             line.chars()
-                .map(|x| x.to_digit(10).unwrap() as usize)
-                .collect::<Vec<usize>>()
+                .map(|x| x.to_digit(10).unwrap() as u16)
+                .collect::<Vec<u16>>()
         })
-        .collect::<Vec<Vec<usize>>>();
+        .collect::<Vec<Vec<u16>>>();
 
     let exit_cell = (map.len() - 1, map[0].len() - 1);
 
     // i, j, direction, steps_count, heat
     let start = (0, 0, 'S', 0, 0);
-    let mut min_value = usize::MAX;
+    let mut min_value = u16::MAX;
 
     let mut visited = HashMap::new();
     let mut stack = vec![start];
 
     while !stack.is_empty() {
-        if min_value < usize::MAX {
-            stack = stack
-                .iter()
-                .filter(|(_, _, _, _, heat)| heat < &min_value)
-                .cloned()
-                .collect();
-        }
         stack.sort_by(|(_, _, _, _, heat1), (_, _, _, _, heat2)| heat2.cmp(heat1));
 
-        let (ii, jj, diir, sterps_count, heeat) = stack.pop().unwrap();
-        if heeat >= min_value {
-            continue;
-        }
+        let (i, j, dir, steps_count, heat) = stack.pop().unwrap();
 
-        let next_points = get_next_points(&map, ii, jj, diir, sterps_count, heeat, &min_value);
+        let next_points = get_next_points(&map, i, j, dir, steps_count, heat, &min_value);
         for (i, j, dir, steps_count, heat) in next_points {
             if (i, j) == exit_cell && steps_count >= 4 {
                 min_value = min_value.min(heat);
@@ -57,14 +47,14 @@ pub fn solve_puzzle(file_name: &str) -> usize {
 }
 
 fn get_next_points(
-    map: &Vec<Vec<usize>>,
+    map: &Vec<Vec<u16>>,
     i: usize,
     j: usize,
     dir: char,
-    steps_count: usize,
-    heat: usize,
-    min_value: &usize,
-) -> Vec<(usize, usize, char, usize, usize)> {
+    steps_count: u16,
+    heat: u16,
+    min_value: &u16,
+) -> Vec<(usize, usize, char, u16, u16)> {
     let mut next_points = Vec::new();
 
     let can_turn = steps_count >= 4;
