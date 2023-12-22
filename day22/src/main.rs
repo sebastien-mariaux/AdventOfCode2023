@@ -1,3 +1,4 @@
+mod cube;
 mod part1;
 mod part2;
 mod utils;
