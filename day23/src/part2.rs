@@ -34,6 +34,7 @@ pub fn solve_puzzle(file_name: &str) -> usize {
         graph.insert(node, adjacents);
     }
 
+    // Solve with DFS ~ 25s
     let mut result = 0;
     let mut stack = vec![vec![(start, 0)]];
     while let Some(path) = stack.pop() {
@@ -54,6 +55,63 @@ pub fn solve_puzzle(file_name: &str) -> usize {
     }
 
     result
+
+    // // solve  with dikjstra
+    // let mut visited: Vec<(usize, usize)> = Vec::new();
+    // let mut djikstra = HashMap::new();
+    // djikstra.insert((start, start), -1 as isize);
+    // for intersection in intersections.iter() {
+    //     for other in intersections.iter() {
+    //         if other == &start && intersection == &start {
+    //             continue;
+    //         }
+    //         if  !djikstra.contains_key(&(*other, *intersection)) {
+    //             djikstra.insert((*intersection, *other), 0);
+    //         }
+    //     }
+    // }
+    // // let mut current_node = start;
+    // let keys = djikstra.keys().map(|(a, b)| (*a, *b)).collect::<Vec<((usize, usize), (usize, usize))>>();
+
+    // loop {
+    //     let new_dijkstra = djikstra.clone();
+    //     let next_data = new_dijkstra
+    //     .iter()
+    //     .filter(|((_, node), _)| !visited.contains(&node) )
+    //     .min_by_key(|(_, distance)| **distance);
+    //     if next_data.is_none() {
+    //         break;
+    //     }
+    //     let ((node, _), distance) = next_data.unwrap();
+    //     let adjacents = graph.get(&node).unwrap();
+    //     for (adjacent, adj_distance) in adjacents.iter() {
+    //         if visited.contains(adjacent) {
+    //             continue;
+    //         }
+    //         // if *adjacent == exit {
+    //         //     result = result.max(distance + adj_distance - 1);
+    //         //     continue;
+    //         // }
+    //         let new_distance = distance.to_owned() - (*adj_distance as isize);
+    //         let key = if keys.contains(&(*adjacent, *node)) {
+    //             (*adjacent, *node)
+    //         } else {
+    //             (*node, *adjacent)
+    //         };
+    //         println!("dijiksta keys: {:?}", keys);
+    //         println!("key: {:?}", key);
+    //         let current_distance = djikstra.get(&key).unwrap().to_owned();
+
+    //         if &new_distance < &current_distance {
+    //             djikstra.insert(key, new_distance);
+    //         }
+
+    //     }
+    //     visited.push(node.to_owned());
+
+    // }
+
+    // djikstra.get(&(start, exit)).unwrap().to_owned() as usize
 }
 
 fn get_adjacents(
@@ -181,7 +239,6 @@ mod test {
     }
 
     #[test]
-    // #[ignore]
     fn test_solution() {
         assert_eq!(6262, solve_puzzle("input"));
     }
