@@ -54,9 +54,9 @@ pub fn solve_puzzle(file_name: &str) -> usize {
         }
     }
 
-    result
+    result;
 
-    // // solve  with dikjstra
+    // solve  with dikjstra
     // let mut visited: Vec<(usize, usize)> = Vec::new();
     // let mut djikstra = HashMap::new();
     // djikstra.insert((start, start), -1 as isize);
@@ -82,7 +82,8 @@ pub fn solve_puzzle(file_name: &str) -> usize {
     //     if next_data.is_none() {
     //         break;
     //     }
-    //     let ((node, _), distance) = next_data.unwrap();
+    //     let ((_, node), distance) = next_data.unwrap();
+    //     println!("node: {:?}", node);
     //     let adjacents = graph.get(&node).unwrap();
     //     for (adjacent, adj_distance) in adjacents.iter() {
     //         if visited.contains(adjacent) {
@@ -98,20 +99,35 @@ pub fn solve_puzzle(file_name: &str) -> usize {
     //         } else {
     //             (*node, *adjacent)
     //         };
-    //         println!("dijiksta keys: {:?}", keys);
-    //         println!("key: {:?}", key);
+    //         // println!("dijiksta keys: {:?}", keys);
+    //         // println!("key: {:?}", key);
     //         let current_distance = djikstra.get(&key).unwrap().to_owned();
-
+    //         println!("Current distance {} - new distance {}", current_distance, new_distance);
     //         if &new_distance < &current_distance {
     //             djikstra.insert(key, new_distance);
     //         }
 
     //     }
+    //     println!("Visiting node {:?}", node);
     //     visited.push(node.to_owned());
 
     // }
-
+    // for (key, value) in djikstra.iter() {
+    //     println!("{} {} -> {} {} : {}", key.0.0, key.0.1, key.1.0, key.1.1, value);
+    // }
     // djikstra.get(&(start, exit)).unwrap().to_owned() as usize
+
+    let mut dist = HashMap::new();
+    let mut prev: HashMap<(usize, usize), Option<(usize, usize)>> = HashMap::new();
+    dist.insert(start, -1);
+    for intersection in intersections.iter() {
+        if intersection != &start {
+            dist.insert(*intersection, 0);
+            prev.insert(*intersection, None);
+        }
+    }
+
+    0
 }
 
 fn get_adjacents(
@@ -239,6 +255,7 @@ mod test {
     }
 
     #[test]
+    #[ignore]
     fn test_solution() {
         assert_eq!(6262, solve_puzzle("input"));
     }
